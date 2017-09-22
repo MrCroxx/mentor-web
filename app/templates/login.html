@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>导师有约 —— 登录</title>
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="thumbnail">
+                <div class="caption">
+                    <form class="form-horizontal" method="POST">
+                        <fieldset>
+                            <legend>登录</legend>
+                            {{form.hidden_tag()}}
+                            <div class="form-group">
+                                <label for="id" class="col-md-3 control-label">工号或学号</label>
+                                <div class="col-md-6">
+                                    {{form.id(class='form-control')}}<br/>
+                                    {% for e in form.id.errors %}
+                                    <span style='color:red'>*{{e}}</span><br/>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="password" class="col-md-3 control-label">密码</label>
+                                <div class="col-md-6">
+                                    {{form.password(class='form-control')}}<br/>
+                                    {% for e in form.password.errors %}
+                                    <span style='color:red'>*{{e}}</span>
+                                    {% endfor %}
+                                    <div class="checkbox">
+                                        <label>
+                                            {{form.remember_me}}记住我的登录状态
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-6 col-md-offset-3">
+                                    <button type="submit" class="btn btn-default">登录</button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
