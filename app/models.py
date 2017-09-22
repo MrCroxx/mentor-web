@@ -96,8 +96,8 @@ class User(db.Model):
 
     def setPasswordhash(self, password, update=True):
         self.salt = random_str()
+        self.passwordhash = getSHA256(password + self.salt)
         if update:
-            self.passwordhash = getSHA256(password + self.salt)
             self.update()
 
     def testPassword(self, password):
