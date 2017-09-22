@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*-
 
 from flask import render_template, url_for, redirect, flash, request, abort, session, g, jsonify, Response
-from app import app, lm, db
+from app import app, lm
+from sqlalchemy import desc
 from flask_jwt import JWT, jwt_required, current_identity
 from app.forms import *
 from flask_login import login_user, logout_user, login_required, current_user
@@ -13,7 +14,6 @@ import os
 import base64
 import math
 import json
-
 
 # Configs and View for Login
 
@@ -53,10 +53,10 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    id= form.id.data
+    id = form.id.data
     password = form.password.data
     if form.validate_on_submit():
-        u = User.query.filter(User.id==id).first()
+        u = User.query.filter(User.id == id).first()
         if u is not None:
             if u.testPassword(password):
                 login_user(u, form.remember_me.data)
@@ -73,3 +73,22 @@ def login():
     return render_template('login.html', form=form)
 
 
+# ajax routes
+
+@app.route('/appointment/list/<offset>')
+@login_required
+def appointment_list(offset):
+    user = current_user
+    app_list = []
+    if user.identify == User.MENTOR:
+        Appointment.query.filter(Appointment.men == user).order_by(
+            desc(Appointment.submit_time)).offset(offset).limit(10)
+    elif user.identify == User.STUDENT:
+        Appointment.query.filter(Appointment.stu == user).order_by(
+            desc(Appointment.submit_time)).offset(offset).limit(10)
+
+
+@app.route('/appointment/new', methods=['POST'])
+@login_required
+def appointment_new():
+    pass

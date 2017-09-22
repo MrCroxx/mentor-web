@@ -36,10 +36,13 @@ class User(db.Model):
     salt = db.Column(db.String(8))
     sex = db.Column(db.Integer)
     phonenum = db.Column(db.String)
-    identiry = db.Column(db.Integer)
+    identify = db.Column(db.Integer)
 
     appointments_stu = db.relationship('appointment', backref='stu')
     appointments_men = db.relationship('appointment', backref='men')
+
+    MENTOR = 1
+    STUDENT = 0
 
     def __init__(self, id, password):
         self.id = id

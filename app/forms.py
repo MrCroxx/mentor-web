@@ -4,7 +4,6 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import StringField, PasswordField, BooleanField, DecimalField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, NumberRange
-from app.uploadsets import *
 
 
 class LoginForm(FlaskForm):
