@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="/static/lib/js/bootstrap.min.js"></script>
+    <link href="/static/lib/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block head %}{% endblock %}
+</head>
+<body style="padding-top: 70px">
+
+
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">导师有约</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <!--
+                <li class="active"><a href="#">Home</a></li>
+                -->
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                {% if current_user.is_authenticated %}
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="/setpassword"><span class="glyphicon glyphicon-pencil"></span>修改密码</a>
+                        </li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/newcourse"><span class="glyphicon glyphicon-plus"></span>创建预约</a></li>
+                        <li><a href="#"><span class="glyphicon glyphicon-cog"></span>查看预约</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span>注销</a></li>
+                        <!--<li class="dropdown-header">Nav header</li>-->
+                    </ul>
+                </li>
+
+                {% else %}
+                <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span>登录</a></li>
+                <li><a href="/register"><span class="glyphicon glyphicon-user"></span>注册</a></li>
+                {% endif %}
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>
+<div class="container">
+    <div class="row">
+        {% for message in get_flashed_messages() %}
+        {% if message[0] == 'D' %}
+        <div class="col-md-10">
+            <div class="alert alert-dismissible alert-danger">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                {{ message[1:] }}
+            </div>
+        </div>
+        {% elif message[0] == 'W' %}
+        <div class="col-md-10">
+            <div class="alert alert-dismissible alert-warning">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                {{ message[1:] }}
+            </div>
+        </div>
+        {% elif message[0] == 'S' %}
+        <div class="col-md-10">
+            <div class="alert alert-dismissible alert-success">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                {{ message[1:] }}
+            </div>
+        </div>
+        {% elif message[0] == 'I' %}
+        <div class="col-md-10">
+            <div class="alert alert-dismissible alert-info">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                {{ message[1:] }}
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+
+</div>
+{% block content %}{% endblock %}
+<br>
+<!div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="well">
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+
