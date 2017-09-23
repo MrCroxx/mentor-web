@@ -72,20 +72,31 @@ def login():
             flash(u'D该学号或工号不存在!')
     return render_template('login.html', form=form)
 
+@app.route('/logout',methods=['GET','POST'])
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
 
 # ajax routes
 
-@app.route('/appointment/list/<offset>')
+@app.route('/appointment/list/<offset>',methods=['Get','POST'])
 @login_required
 def appointment_list(offset):
     user = current_user
     app_list = []
+    app_dict_list = []
     if user.identify == User.MENTOR:
-        Appointment.query.filter(Appointment.men == user).order_by(
-            desc(Appointment.submit_time)).offset(offset).limit(10)
+        app_list = Appointment.query.filter(Appointment.men == user).order_by(
+            desc(Appointment.submit_time)).offset(offset).limit(10).all()
     elif user.identify == User.STUDENT:
-        Appointment.query.filter(Appointment.stu == user).order_by(
-            desc(Appointment.submit_time)).offset(offset).limit(10)
+        app_list = Appointment.query.filter(Appointment.stu == user).order_by(
+            desc(Appointment.submit_time)).offset(offset).limit(10).all()
+    for appointment in app_list:
+        app_dict_list.append(appointment.toDict())
+    return jsonify(app_dict_list)
+
 
 
 @app.route('/appointment/new', methods=['POST'])

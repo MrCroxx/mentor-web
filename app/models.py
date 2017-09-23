@@ -2,7 +2,7 @@
 from random import Random
 import hashlib
 import time
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta
 from app import db
 
 
@@ -50,12 +50,28 @@ class Appointment(db.Model):
         status = Appointment.WAITING
         self.submit_time = datetime.now()
 
+    def toDict(self):
+        return {
+            'status': self.status,
+            'stu_id': self.stu.id,
+            'stu_name': self.stu.name,
+            'mentor_id': self.men.id,
+            'mentor_name': self.men.name,
+            'submit_time': self.submit_time.strftime('%Y-%m-%d %H:%M:%S') if self.submit_time else u'暂无数据',
+            'reply_time': self.reply_time.strftime('%Y-%m-%d %H:%M:%S') if self.reply_time else u'暂无数据',
+            'description': self.description,
+            'replytext': self.replytext,
+        }
+
+    def __lt__(self, other):
+        return self.submit_time < other.submit_time
+
     def update(self):
         db.session.add(self)
         db.session.commit()
 
-    def reply(self,status,replytext):
-        self.status=status
+    def reply(self, status, replytext):
+        self.status = status
         self.replytext = replytext
         self.update()
 
