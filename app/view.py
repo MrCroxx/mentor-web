@@ -86,6 +86,13 @@ def appointment_list():
     return render_template('appointment_list.html')
 
 
+@app.route('/appointment/new', methods=['GET'])
+@login_required
+def appointment_new():
+    form = AppointmentNewForm()
+    return render_template('examples/appointment_new.html', form=form)
+
+
 # ajax routes
 
 @app.route('/ajax/appointment/list/<offset>', methods=['GET', 'POST'])
@@ -108,6 +115,7 @@ def ajax_appointment_list(offset):
 @app.route('/ajax/appointment/new', methods=['POST'])
 @login_required
 def ajax_appointment_new():
+    print request.form
     form = AppointmentNewForm()
     if current_user.identify == User.STUDENT:
         if form.validate_on_submit():
@@ -115,9 +123,12 @@ def ajax_appointment_new():
             description = form.description.data
             men = User.query.filter(User.id == men_id).first()
             if men is not None:
-                appointment = Appointment(current_user, men, description)
-                appointment.update()
-                return jsonify({'status': SUCCESS})
+                if men.identify == User.MENTOR:
+                    appointment = Appointment(current_user, men, description)
+                    appointment.update()
+                    return jsonify({'status': SUCCESS})
+                else:
+                    return jsonify({'status': BAD})
             else:
                 return jsonify({'status': BAD})
         else:
