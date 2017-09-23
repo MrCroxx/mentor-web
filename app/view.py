@@ -3,13 +3,13 @@
 from flask import render_template, url_for, redirect, flash, request, abort, session, g, jsonify, Response
 from app import app, lm
 from sqlalchemy import desc
-from flask_jwt import JWT, jwt_required, current_identity
 from app.forms import *
 from flask_login import login_user, logout_user, login_required, current_user
 from urlparse import urlparse, urljoin
 from identifyingcode import drawIdentifyingCode
 from PIL import Image
 from app.models import *
+from config import SUCCESS, BAD
 import os
 import base64
 import math
@@ -72,18 +72,25 @@ def login():
             flash(u'D该学号或工号不存在!')
     return render_template('login.html', form=form)
 
-@app.route('/logout',methods=['GET','POST'])
+
+@app.route('/logout', methods=['GET', 'POST'])
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('index'))
 
 
+@app.route('/appointment/list', methods=['GET', 'POST'])
+@login_required
+def appointment_list():
+    return render_template('appointment_list.html')
+
+
 # ajax routes
 
-@app.route('/appointment/list/<offset>',methods=['Get','POST'])
+@app.route('/ajax/appointment/list/<offset>', methods=['GET', 'POST'])
 @login_required
-def appointment_list(offset):
+def ajax_appointment_list(offset):
     user = current_user
     app_list = []
     app_dict_list = []
@@ -95,11 +102,25 @@ def appointment_list(offset):
             desc(Appointment.submit_time)).offset(offset).limit(10).all()
     for appointment in app_list:
         app_dict_list.append(appointment.toDict())
-    return jsonify(app_dict_list)
+    return jsonify({'status': SUCCESS, 'data': app_dict_list})
 
 
-
-@app.route('/appointment/new', methods=['POST'])
+@app.route('/ajax/appointment/new', methods=['POST'])
 @login_required
-def appointment_new():
-    pass
+def ajax_appointment_new():
+    form = AppointmentNewForm()
+    if current_user.identify == User.STUDENT:
+        if form.validate_on_submit():
+            men_id = form.men_id.data
+            description = form.description.data
+            men = User.query.filter(User.id == men_id).first()
+            if men is not None:
+                appointment = Appointment(current_user, men, description)
+                appointment.update()
+                return jsonify({'status': SUCCESS})
+            else:
+                return jsonify({'status': BAD})
+        else:
+            return jsonify({'status': BAD})
+    else:
+        return jsonify({'status': BAD})
