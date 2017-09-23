@@ -98,6 +98,11 @@ def appointment_new():
 @app.route('/ajax/appointment/list/<offset>', methods=['GET', 'POST'])
 @login_required
 def ajax_appointment_list(offset):
+    '''
+    用来获取预约列表。自动检测身份，学生返回预约列表，门特返回被预约列表。每次10条。
+    :param offset:起始条目。
+    :return:json：{'status':状态代码（SUCCESS or BAD 详见config.py）,'data':[json列表，包含字典格式的预约信息，信息都是字符串，详见Appointment.toDict()函数]}
+    '''
     user = current_user
     app_list = []
     app_dict_list = []
@@ -115,6 +120,11 @@ def ajax_appointment_list(offset):
 @app.route('/ajax/appointment/new', methods=['POST'])
 @login_required
 def ajax_appointment_new():
+    '''
+    创建预约。使用Ajax提交表单，注意再headers加入X-CSRF-TOKEN，详见app/templates/examples/appointment_new.html中的form_submit方法。
+    （所有的表单都在app.forms.py中，详见里面的类，类名都很直白hhhhh）
+    :return:json:{'status':状态码} 注意除了需要处理状态码还要处理请求失败（error函数）。
+    '''
     print request.form
     form = AppointmentNewForm()
     if current_user.identify == User.STUDENT:
