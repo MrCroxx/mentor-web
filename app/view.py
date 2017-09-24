@@ -145,3 +145,54 @@ def ajax_appointment_new():
             return jsonify({'status': BAD})
     else:
         return jsonify({'status': BAD})
+
+
+@app.route('/ajax/appointment/<aid>/reply', methods=['GET', 'POST'])
+@login_required
+def ajax_appointment_reply(aid):
+    '''
+    教师回复学生预约请求。
+    :param aid:预约id。
+    :return:json：{'status':状态代码（SUCCESS or BAD 详见config.py）}
+    '''
+    form = AppointmentReplyForm()
+    if form.validate_on_submit():
+        user = current_user
+        appointment = Appointment.query.filter(id == aid).first()
+
+        if user.identify == User.MENTOR:
+            if (appointment is not None) and (appointment.men == user):
+                replytext = form.replytext.data
+                status = Appointment.PASS if form.status.data else Appointment.DENY
+                appointment.replytext = replytext
+                appointment.status = status
+                appointment.update()
+                return jsonify({'statis': SUCCESS})
+            else:
+                return jsonify({'status': BAD})
+        else:
+            return jsonify({'status': BAD})
+    else:
+        return jsonify({'status': BAD})
+
+
+@app.route('/ajax/appointment/<aid>/delete', methods=['GET', 'POST'])
+@login_required
+def ajax_appointment_reply(aid):
+    '''
+    学生撤销预约。
+    :param aid:预约id。
+    :return:json：{'status':状态代码（SUCCESS or BAD 详见config.py）}
+    '''
+
+    user = current_user
+    appointment = Appointment.query.filter(id == aid).first()
+
+    if user.identify == User.MENTOR:
+        if (appointment is not None) and (appointment.stu == user):
+            appointment.delete()
+            return jsonify({'statis': SUCCESS})
+        else:
+            return jsonify({'status': BAD})
+    else:
+        return jsonify({'status': BAD})

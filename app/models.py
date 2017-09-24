@@ -75,6 +75,10 @@ class Appointment(db.Model):
         self.replytext = replytext
         self.update()
 
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
 
 class User(db.Model):
     __tablename__ = 'User'

@@ -11,7 +11,7 @@ class LoginForm(FlaskForm):
         'id',
         validators=[
             DataRequired(message=u'请输入学号或工号!'),
-            #NumberRange(min=0, max=99999999, message=u'请输入八位学号!'),
+            # NumberRange(min=0, max=99999999, message=u'请输入八位学号!'),
             Length(4, 10, message=u'学号或工号必须在4-10位之间!')
         ]
     )
@@ -24,6 +24,7 @@ class LoginForm(FlaskForm):
     )
     remember_me = BooleanField('remember_me', default=False)
 
+
 class AppointmentNewForm(FlaskForm):
     men_id = StringField(
         'men_id',
@@ -35,3 +36,11 @@ class AppointmentNewForm(FlaskForm):
         'description',
     )
 
+
+class AppointmentReplyForm(FlaskForm):
+    replytext = StringField(
+        'replytext',
+    )
+    status = BooleanField(
+        'status',
+    )
