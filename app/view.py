@@ -196,3 +196,15 @@ def ajax_appointment_reply(aid):
             return jsonify({'status': BAD})
     else:
         return jsonify({'status': BAD})
+
+
+
+
+
+
+
+
+
+
+
+
