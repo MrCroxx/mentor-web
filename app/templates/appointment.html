@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% from 'macros.html' import user_block,user_block_detail,user_block_with_modal_appointment_new %}
+
+{% block head %}
+    <title>导师有约 —— 导师预约</title>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2>可预约导师</h2>
+                    </div>
+                </div>
+
+                <div class="row">
+                    {% for user in mens %}
+                        <div class="col-md-4">
+                            {{ user_block_with_modal_appointment_new(user,form) }}
+                        </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

@@ -36,7 +36,7 @@
                                         //Croxx:这里用来获取CSRF-TOKEN
 
                                         function ajax_submit() {
-
+                                            alert($('#form-new').serialize());
                                             $.ajax({
                                                 type: "POST",
                                                 url: "/ajax/appointment/new",

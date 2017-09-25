@@ -43,6 +43,11 @@ def getMD5(content):
     return MD5.hexdigest()
 
 
+# 常量
+department_to_string = {
+    21: u'软件学院',
+}
+
 # 多对多关系表
 relation_course_student = db.Table('relation_course_student',
                                    db.Column('course_id', db.Integer,
@@ -114,7 +119,7 @@ class Course(db.Model):
     __tablename__ = 'Course'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 团体课id 自增主键
     name = db.Column(db.String, index=True)  # 团体课名称
-    department = db.Column(db.Integer) # 学院id
+    department = db.Column(db.Integer)  # 学院id
     men_id = db.Column(db.Integer, db.ForeignKey('User.id'))  # 外键 导师id
     stus = db.relationship('User', secondary=relation_course_student, backref=db.backref(
         'courses_stu', lazy='dynamic'), lazy='dynamic')
@@ -198,6 +203,9 @@ class User(db.Model):
     def login(self):
         self.time_lastlogin = datetime.now()
         self.update()
+
+    def getDepartmentString(self):
+        return department_to_string[self.department]
 
     # for flask-login
 

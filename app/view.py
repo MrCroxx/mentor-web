@@ -103,7 +103,10 @@ def info_setpassword():
 @app.route('/appointment')
 @login_required
 def appointment():
-    return render_template('apointment.html')
+    user = User.query.filter(User.id == 16210001).first()
+    form = AppointmentNewForm()
+    mens = User.query.filter(User.identify==User.IDENTIFY_MENTOR).all()
+    return render_template('appointment.html', mens=mens, form=form)
 
 
 @app.route('/course', methods=['GET'])
@@ -151,10 +154,10 @@ def ajax_appointment_list(offset):
     user = current_user
     app_list = []
     app_dict_list = []
-    if user.identify == User.MENTOR:
+    if user.identify == User.IDENTIFY_MENTOR:
         app_list = Appointment.query.filter(Appointment.men == user).order_by(
             desc(Appointment.submit_time)).offset(offset).limit(10).all()
-    elif user.identify == User.STUDENT:
+    elif user.identify == User.IDENTIFY_STUDENT:
         app_list = Appointment.query.filter(Appointment.stu == user).order_by(
             desc(Appointment.submit_time)).offset(offset).limit(10).all()
     for appointment in app_list:
@@ -192,15 +195,14 @@ def ajax_appointment_new():
     （所有的表单都在app.forms.py中，详见里面的类，类名都很直白hhhhh）
     :return:json:{'status':状态码} 注意除了需要处理状态码还要处理请求失败（error函数）。
     '''
-    print request.form
     form = AppointmentNewForm()
-    if current_user.identify == User.STUDENT:
+    if current_user.identify == User.IDENTIFY_STUDENT:
         if form.validate_on_submit():
             men_id = form.men_id.data
             description = form.description.data
             men = User.query.filter(User.id == men_id).first()
             if men is not None:
-                if men.identify == User.MENTOR:
+                if men.identify == User.IDENTIFY_MENTOR:
                     appointment = Appointment(current_user, men, description)
                     appointment.update()
                     return jsonify({'status': SUCCESS})
