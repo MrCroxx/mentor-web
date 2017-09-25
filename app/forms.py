@@ -25,6 +25,37 @@ class LoginForm(FlaskForm):
     remember_me = BooleanField('remember_me', default=False)
 
 
+class SetPasswordForm(FlaskForm):
+    password_old = PasswordField(
+        'password_old',
+        validators=[
+            DataRequired(message=u'请输入旧登录密码!'),
+            Length(6, 30, message=u'登录密码长度应在6-30个字符内!')
+        ]
+    )
+    password_new = PasswordField(
+        'password_new',
+        validators=[
+            DataRequired(message=u'请输入新登录密码!'),
+            Length(6, 30, message=u'登录密码长度应在6-30个字符内!')
+        ]
+    )
+    password_confirm = PasswordField(
+        'password_confirm',
+        validators=[
+            DataRequired(message=u'请输入新登录密码!'),
+            Length(6, 30, message=u'登录密码长度应在6-30个字符内!')
+        ]
+    )
+    identifyingcode = StringField(
+        'identifyingcode',
+        validators=[
+            DataRequired(message=u'请输入4字符的验证码!'),
+            Length(4, 4, message=u'请输入4字符的验证码!')
+        ]
+    )
+
+
 class AppointmentNewForm(FlaskForm):
     men_id = StringField(
         'men_id',

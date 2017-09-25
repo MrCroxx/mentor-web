@@ -38,11 +38,11 @@ def before_request():
     g.user = current_user
 
 
-# normal views
+# web views
 
 
 @app.route('/')
-@app.route('/index')
+@app.route('/index', methods=['GET'])
 def index():
     return render_template('index.html')
 
@@ -80,30 +80,91 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/appointment/list', methods=['GET', 'POST'])
+@app.route('/info/setpassword', methods=['GET', 'POST'])
 @login_required
-def appointment_list():
-    return render_template('appointment_list.html')
+def info_setpassword():
+    user = current_user
+    form = SetPasswordForm()
+    if form.validate_on_submit():
+        password_old = form.password_old.data
+        password_new = form.password_new.data
+        identifyingcode = form.identifyingcode.data
+        if 'code_text' in session and identifyingcode.upper() == session['code_text']:
+            if user.testPassword(password_old):
+                user.setPasswordhash(password_new)
+                flash(u'S修改成功!')
+            else:
+                flash(u'D密码错误!')
+        else:
+            flash(u'D验证码错误!')
+    return render_template('info_setpassword.html', form=form)
 
 
-@app.route('/appointment/new', methods=['GET'])
+@app.route('/appointment')
 @login_required
-def appointment_new():
-    form = AppointmentNewForm()
-    return render_template('examples/appointment_new.html', form=form)
+def appointment():
+    return render_template('apointment.html')
 
-@app.route('/info/setpassword',methods=['GET','POST'])
+
+@app.route('/course', methods=['GET'])
 @login_required
-def info_setpassword:
-    form = None
-    return render_template('setpassword',form=form)
+def course():
+    return render_template('course.html')
+
+
+@app.route('/result/stu', methods=['GET'])
+@login_required
+def result_stu():
+    return render_template('result_stu.html')
+
+
+@app.route('/result/men', methods=['GET'])
+@login_required
+def result_men():
+    return render_template('result_men.html')
+
+
+@app.route('/course/new', methods=['GET', 'POST'])
+@login_required
+def course_new():
+    return render_template('course_new.html')
 
 
 # ajax routes
 
-@app.route('/ajax/appointment/mine/<offset>', methods=['GET', 'POST'])
+@app.route('/ajax/getIdentifyingcode', methods=['POST'])
+def getIdentifyingcode():
+    code_img, code_text = drawIdentifyingCode()
+    session['code_text'] = code_text
+    code_uri = '/static/tmp/code/' + getSHA256(code_text)
+    return jsonify({'code_uri': code_uri})
+
+
+@app.route('/ajax/appointment/list/<offset>', methods=['GET', 'POST'])
 @login_required
-def ajax_appointment_mine(offset):
+def ajax_appointment_list(offset):
+    '''
+    用来获取预约列表。自动检测身份，学生返回预约列表，门特返回被预约列表。每次10条。
+    :param offset:起始条目。
+    :return:json：{'status':状态代码（SUCCESS or BAD 详见config.py）,'data':[json列表，包含字典格式的预约信息，信息都是字符串，详见Appointment.toDict()函数]}
+    '''
+    user = current_user
+    app_list = []
+    app_dict_list = []
+    if user.identify == User.MENTOR:
+        app_list = Appointment.query.filter(Appointment.men == user).order_by(
+            desc(Appointment.submit_time)).offset(offset).limit(10).all()
+    elif user.identify == User.STUDENT:
+        app_list = Appointment.query.filter(Appointment.stu == user).order_by(
+            desc(Appointment.submit_time)).offset(offset).limit(10).all()
+    for appointment in app_list:
+        app_dict_list.append(appointment.toDict())
+    return jsonify({'status': SUCCESS, 'data': app_dict_list})
+
+
+@app.route('/ajax/course/list/<offset>', methods=['GET', 'POST'])
+@login_required
+def ajax_course_list(offset):
     '''
     用来获取预约列表。自动检测身份，学生返回预约列表，门特返回被预约列表。每次10条。
     :param offset:起始条目。
@@ -184,7 +245,7 @@ def ajax_appointment_reply(aid):
 
 @app.route('/ajax/appointment/<aid>/delete', methods=['GET', 'POST'])
 @login_required
-def ajax_appointment_reply(aid):
+def ajax_appointment_delete(aid):
     '''
     学生撤销预约。
     :param aid:预约id。

@@ -114,6 +114,7 @@ class Course(db.Model):
     __tablename__ = 'Course'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 团体课id 自增主键
     name = db.Column(db.String, index=True)  # 团体课名称
+    department = db.Column(db.Integer) # 学院id
     men_id = db.Column(db.Integer, db.ForeignKey('User.id'))  # 外键 导师id
     stus = db.relationship('User', secondary=relation_course_student, backref=db.backref(
         'courses_stu', lazy='dynamic'), lazy='dynamic')

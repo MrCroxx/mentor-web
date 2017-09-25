@@ -20,7 +20,7 @@ def drawIdentifyingCode(width=220, height=50):
 
     image = Image.new('RGB', (width, height), (255, 255, 255))
 
-    font = ImageFont.truetype('app/static/fonts/Arial.ttf', 32)
+    font = ImageFont.truetype('app/static/lib/fonts/Arial.ttf', 32)
 
     draw = ImageDraw.Draw(image)
 
