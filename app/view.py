@@ -9,6 +9,7 @@ from urlparse import urlparse, urljoin
 from identifyingcode import drawIdentifyingCode
 from PIL import Image
 from app.models import *
+from datetime import datetime, timedelta
 from config import SUCCESS, BAD
 import os
 import base64
@@ -25,10 +26,6 @@ def is_safe_url(target):
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, target))
     return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
-
-
-def is_safe_url(next):
-    return next
 
 
 @lm.user_loader
@@ -60,11 +57,14 @@ def login():
         if u is not None:
             if u.testPassword(password):
                 login_user(u, form.remember_me.data)
+                u.login()
                 next = request.args.get('next')
+                if u.chpassword == False:
+                    return redirect(url_for('info_setpassword'))
                 if next is None:
                     return redirect(url_for('index'))
                 if not is_safe_url(next):
-                    return abort(400)
+                    return redirect(url_for('index'))
                 return redirect(next or url_for('index'))
             else:
                 flash(u'D密码错误!')
@@ -92,12 +92,18 @@ def appointment_new():
     form = AppointmentNewForm()
     return render_template('examples/appointment_new.html', form=form)
 
+@app.route('/info/setpassword',methods=['GET','POST'])
+@login_required
+def info_setpassword:
+    form = None
+    return render_template('setpassword',form=form)
+
 
 # ajax routes
 
-@app.route('/ajax/appointment/list/<offset>', methods=['GET', 'POST'])
+@app.route('/ajax/appointment/mine/<offset>', methods=['GET', 'POST'])
 @login_required
-def ajax_appointment_list(offset):
+def ajax_appointment_mine(offset):
     '''
     用来获取预约列表。自动检测身份，学生返回预约列表，门特返回被预约列表。每次10条。
     :param offset:起始条目。
@@ -196,15 +202,3 @@ def ajax_appointment_reply(aid):
             return jsonify({'status': BAD})
     else:
         return jsonify({'status': BAD})
-
-
-
-
-
-
-
-
-
-
-
-
