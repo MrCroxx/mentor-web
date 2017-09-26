@@ -100,7 +100,8 @@ def info_setpassword():
 @app.route('/appointment')
 @login_required
 def appointment():
-    user = User.query.filter(User.id == 16210001).first()
+    if current_user.identify == User.IDENTIFY_MENTOR:
+        abort(403)
     form = AppointmentNewForm()
     mens = User.query.filter(User.identify == User.IDENTIFY_MENTOR).all()
     return render_template('appointment.html', mens=mens, form=form)
@@ -109,7 +110,10 @@ def appointment():
 @app.route('/course', methods=['GET'])
 @login_required
 def course():
-    return render_template('course.html')
+    if current_user.identify == User.IDENTIFY_MENTOR:
+        abort(403)
+    courses = Course.query.filter(Course.time_deadline > datetime.now()).order_by(Course.time_start).all()
+    return render_template('course.html', courses=courses)
 
 
 @app.route('/result/stu', methods=['GET'])
@@ -121,7 +125,11 @@ def result_stu():
 @app.route('/result/men', methods=['GET'])
 @login_required
 def result_men():
-    return render_template('result_men.html')
+    user = current_user
+    if user.identify == User.IDENTIFY_STUDENT:
+        abort(403)
+    appointments = Appointment.query.filter(Appointment.men == user).order_by(Appointment.time_submit).all()
+    return render_template('result_men.html', appointments=appointments)
 
 
 @app.route('/course/new', methods=['GET', 'POST'])
@@ -246,27 +254,76 @@ def ajax_appointment_new():
         return jsonify({'status': BAD})
 
 
-@app.route('/ajax/appointment/<aid>/reply', methods=['GET', 'POST'])
+@app.route('/ajax/appointment/<aid>/pass', methods=['GET', 'POST'])
 @login_required
-def ajax_appointment_reply(aid):
+def ajax_appointment_pass(aid):
     '''
-    教师回复学生预约请求。
+    教师通过学生预约请求。
     :param aid:预约id。
     :return:json：{'status':状态代码（SUCCESS or BAD 详见config.py）}
     '''
-    form = AppointmentReplyForm()
+    form = AppointmentReplyPassForm()
     if form.validate_on_submit():
         user = current_user
-        appointment = Appointment.query.filter(id == aid).first()
-
-        if user.identify == User.MENTOR:
-            if (appointment is not None) and (appointment.men == user):
+        appointment = Appointment.query.filter(Appointment.id == aid).first()
+        if user.identify == User.IDENTIFY_MENTOR:
+            if (appointment is not None) and (appointment.status == Appointment.STATUS_WAITING) and (
+                        appointment.men.id == user.id):
                 replytext = form.replytext.data
-                status = Appointment.PASS if form.status.data else Appointment.DENY
+                location = form.location.data
+                status = Appointment.STATUS_PASS
+                time_start_string = form.time_start.data
+                time_end_string = form.time_end.data
+
+                match = re.search(r'(\d+)-(\d+)-(\d+) (\d+):(\d+)', time_start_string)
+                y, m, d, h, i = int(match.group(1)), int(match.group(2)), int(match.group(3)), int(match.group(4)), int(
+                    match.group(5))
+                time_start = datetime(y, m, d, h, i)
+
+                match = re.search(r'(\d+)-(\d+)-(\d+) (\d+):(\d+)', time_end_string)
+                y, m, d, h, i = int(match.group(1)), int(match.group(2)), int(match.group(3)), int(match.group(4)), int(
+                    match.group(5))
+                time_end = datetime(y, m, d, h, i)
+
                 appointment.replytext = replytext
+                appointment.location = location
                 appointment.status = status
+                appointment.time_start = time_start
+                appointment.time_end = time_end
+                appointment.time_reply = datetime.now()
+
                 appointment.update()
-                return jsonify({'statis': SUCCESS})
+                return jsonify({'status': SUCCESS})
+            else:
+                return jsonify({'status': BAD})
+        else:
+            return jsonify({'status': BAD})
+    else:
+        return jsonify({'status': BAD})
+
+
+@app.route('/ajax/appointment/<aid>/deny', methods=['GET', 'POST'])
+@login_required
+def ajax_appointment_deny(aid):
+    '''
+    教师拒绝学生预约请求。
+    :param aid:预约id。
+    :return:json：{'status':状态代码（SUCCESS or BAD 详见config.py）}
+    '''
+    form = AppointmentReplyDenyForm()
+    if form.validate_on_submit():
+        user = current_user
+        appointment = Appointment.query.filter(Appointment.id == aid).first()
+        if user.identify == User.IDENTIFY_MENTOR:
+            if (appointment is not None) and (appointment.status == Appointment.STATUS_WAITING) and (
+                        appointment.men.id == user.id):
+                replytext = form.replytext.data
+                appointment.replytext = replytext
+                appointment.time_reply = datetime.now()
+                appointment.status = Appointment.STATUS_DENY
+
+                appointment.update()
+                return jsonify({'status': SUCCESS})
             else:
                 return jsonify({'status': BAD})
         else:
@@ -297,32 +354,23 @@ def ajax_appointment_delete(aid):
         return jsonify({'status': BAD})
 
 
-@app.route('/ajax/course/new', methods=['POST'])
+@app.route('/ajax/course/<cid>/sign', methods=['GET', 'POST'])
 @login_required
-def ajax_course_new():
+def ajax_course_sign(cid):
     '''
-    创建团体课。使用Ajax提交表单，注意再headers加入X-CSRF-TOKEN，详见app/templates/examples/appointment_new.html中的form_submit方法。
-    （所有的表单都在app.forms.py中，详见里面的类，类名都很直白hhhhh）
-    :return:json:{'status':状态码} 注意除了需要处理状态码还要处理请求失败（error函数）。
+    学生选课
+    :param cid:课程id。
+    :return: json：{'status':状态代码（SUCCESS or BAD 详见config.py）}
     '''
-    form = CourseNewForm()
-    if current_user.identify == User.IDENTIFY_MENTOR:
-        if form.validate_on_submit():
-            men = current_user
-            name = form.name.data
-            capacity = form.capacity.data
-            department = form.department.data
-            description = form.description.data
-            location = form.location.data
-            time_start = form.time_start.data
-            time_end = form.time_end.data
-            time_deadline = form.time_deadline.data
-
-            course = Course(name, department, men, capacity, description, location, time_start, time_end, time_deadline)
-            course.update()
-
-            return jsonify({'status': SUCCESS})
-
+    user = current_user
+    if user.identify == User.IDENTIFY_STUDENT:
+        course = Course.query.filter(Course.id == cid).first()
+        if course is not None:
+            if (not course.full()) and (course.time_deadline > datetime.now()):
+                course.addStu(user)
+                return jsonify({'status': SUCCESS})
+            else:
+                return jsonify({'status': BAD})
         else:
             return jsonify({'status': BAD})
     else:
