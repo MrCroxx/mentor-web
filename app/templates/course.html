@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% from 'macros.html' import user_block,user_block_detail,user_block_with_modal_appointment_new %}
+
+{% block head %}
+    <title>导师有约 —— 团体课选课</title>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2>可选课程</h2>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>课程名称</th>
+                                <th>主讲人</th>
+                                <th>课程简介</th>
+                                <th>教室</th>
+                                <th>开始时间</th>
+                                <th>结束时间</th>
+                                <th>选课截至时间</th>
+                                <th>已选/容量</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for course in courses %}
+                                <tr>
+                                    <td>{{ course.name }}</td>
+                                    <td>{{ course.men.name }}</td>
+                                    <td>{{ course.description }}</td>
+                                    <td>{{ course.location }}</td>
+                                    <td>{{ course.time_start.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>{{ course.time_end.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>{{ course.time_deadline.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>{{ course.getSignedNum() }}/{{ course.capacity }}</td>
+                                    <td>
+                                        {% if course.full() %}
+                                            <div class="btn btn-default disabled"
+                                                 onclick="ajax_course_{{ course.id|safe }}_sign()">选课
+                                            </div>
+                                        {% else %}
+                                            <div class="btn btn-primary"
+                                                 onclick="ajax_course_{{ course.id|safe }}_sign()">选课
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <script>
+                                    var csrftoken = "{{ csrf_token()|safe }}";
+
+                                    function ajax_course_{{course.id|safe}}_sign() {
+                                        $.ajax({
+                                            type: "POST",
+                                            url: "/ajax/course/{{ course.id|safe }}/sign",
+                                            dataType: 'json',
+                                            async: false,
+                                            beforeSend: function (xhr, settings) {
+                                                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                                            },
+                                            error: function (request) {
+                                                alert("选课失败![网络错误]");
+                                            },
+                                            success: function (data) {
+                                                if (data.status == 20000) {
+                                                    alert("选课成功!");
+                                                } else {
+                                                    alert("选课失败![数据错误]")
+                                                }
+                                            }
+                                        });
+
+
+                                    }
+                                </script>
+
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

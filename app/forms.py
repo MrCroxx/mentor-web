@@ -116,10 +116,30 @@ class CourseNewForm(FlaskForm):
     )
 
 
-class AppointmentReplyForm(FlaskForm):
+class AppointmentReplyPassForm(FlaskForm):
     replytext = StringField(
         'replytext',
     )
-    status = BooleanField(
-        'status',
+    location = StringField(
+        'location',
+    )
+    time_start = StringField(
+        'time_start',
+        validators=[
+            DataRequired(message=u'请选择预约开始时间!'),
+            Regexp(r'(\d+)-(\d+)-(\d+) (\d+):(\d+)', message=u'请选择正确的日期与时间!')
+        ]
+    )
+    time_end = StringField(
+        'time_end',
+        validators=[
+            DataRequired(message=u'请选择预约结束时间!'),
+            Regexp(r'(\d+)-(\d+)-(\d+) (\d+):(\d+)', message=u'请选择正确的日期与时间!')
+        ]
+    )
+
+
+class AppointmentReplyDenyForm(FlaskForm):
+    replytext = StringField(
+        'replytext',
     )

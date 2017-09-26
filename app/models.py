@@ -158,6 +158,15 @@ class Course(db.Model):
             self.stus.remove(stu)
             self.update()
 
+    def getSignedNum(self):
+        return self.stus.count()
+
+    def getDepartmentString(self):
+        return department_to_string[self.department]
+
+    def full(self):
+        return self.stus.count() >= self.capacity
+
 
 class User(db.Model):
     __tablename__ = 'User'
@@ -177,7 +186,7 @@ class User(db.Model):
     # 一对多 预约(学生)
     appointments_men = db.relationship('Appointment', backref='men', foreign_keys=[Appointment.men_id])
     # 一对多 预约(导师)
-    courses_men = db.relationship('Course', backref='mem', foreign_keys=[Course.men_id])
+    courses_men = db.relationship('Course', backref='men', foreign_keys=[Course.men_id])
     # 一对多 团体课(导师)
     # courses_stus 定义见多对多关系表'relation_course_student'与团体课表'Course'
     # 多对多 团体课(学生)

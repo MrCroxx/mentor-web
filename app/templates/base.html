@@ -35,33 +35,34 @@
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 {% if current_user.is_authenticated %}
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                       aria-expanded="false">
-                        <p>欢迎,{{ current_user.name }}</p>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a href="/info/setpassword"><span class="glyphicon glyphicon-pencil"></span>修改密码</a>
-                        </li>
-                        <li role="separator" class="divider"></li>
-                        {% if current_user.isStu() %}
-                        <li><a href="/appointment"><span class="glyphicon glyphicon-plus"></span>预约导师</a></li>
-                        <li><a href="/course"><span class="glyphicon glyphicon-plus"></span>预约团体课</a></li>
-                        <li><a href="/appointment/list"><span class="glyphicon glyphicon-cog"></span>查看预约</a>
-                        </li>
-                        {% elif current_user.isMen() %}
-                        <li><a href="/course/new"><span class="glyphicon glyphicon-plus"></span>创建团体课</a></li>
-                        {% endif %}
-                        <li role="separator" class="divider"></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">
+                            <p>欢迎,{{ current_user.name }}</p>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="/info/setpassword"><span class="glyphicon glyphicon-pencil"></span>修改密码</a>
+                            </li>
+                            <li role="separator" class="divider"></li>
+                            {% if current_user.isStu() %}
+                                <li><a href="/appointment"><span class="glyphicon glyphicon-plus"></span>预约导师</a></li>
+                                <li><a href="/course"><span class="glyphicon glyphicon-plus"></span>预约团体课</a></li>
+                                <li><a href="/result/stu"><span class="glyphicon glyphicon-cog"></span>查看结果</a>
+                                </li>
+                            {% elif current_user.isMen() %}
+                                <li><a href="/course/new"><span class="glyphicon glyphicon-plus"></span>创建团体课</a></li>
+                                <li><a href="/result/men"><span class="glyphicon glyphicon-cog"></span>查看预约</a>
+                            {% endif %}
+                            <li role="separator" class="divider"></li>
 
-                        <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span>注销</a></li>
-                        <!--<li class="dropdown-header">Nav header</li>-->
-                    </ul>
-                </li>
+                            <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span>注销</a></li>
+                            <!--<li class="dropdown-header">Nav header</li>-->
+                        </ul>
+                    </li>
 
                 {% else %}
-                <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span>登录</a></li>
+                    <li><a href="/login"><span class="glyphicon glyphicon-log-in"></span>登录</a></li>
                 {% endif %}
             </ul>
         </div><!--/.nav-collapse -->
@@ -70,35 +71,35 @@
 <div class="container">
     <div class="row">
         {% for message in get_flashed_messages() %}
-        {% if message[0] == 'D' %}
-        <div class="col-md-10">
-            <div class="alert alert-dismissible alert-danger">
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
-                {{ message[1:] }}
-            </div>
-        </div>
-        {% elif message[0] == 'W' %}
-        <div class="col-md-10">
-            <div class="alert alert-dismissible alert-warning">
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
-                {{ message[1:] }}
-            </div>
-        </div>
-        {% elif message[0] == 'S' %}
-        <div class="col-md-10">
-            <div class="alert alert-dismissible alert-success">
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
-                {{ message[1:] }}
-            </div>
-        </div>
-        {% elif message[0] == 'I' %}
-        <div class="col-md-10">
-            <div class="alert alert-dismissible alert-info">
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
-                {{ message[1:] }}
-            </div>
-        </div>
-        {% endif %}
+            {% if message[0] == 'D' %}
+                <div class="col-md-10">
+                    <div class="alert alert-dismissible alert-danger">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        {{ message[1:] }}
+                    </div>
+                </div>
+            {% elif message[0] == 'W' %}
+                <div class="col-md-10">
+                    <div class="alert alert-dismissible alert-warning">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        {{ message[1:] }}
+                    </div>
+                </div>
+            {% elif message[0] == 'S' %}
+                <div class="col-md-10">
+                    <div class="alert alert-dismissible alert-success">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        {{ message[1:] }}
+                    </div>
+                </div>
+            {% elif message[0] == 'I' %}
+                <div class="col-md-10">
+                    <div class="alert alert-dismissible alert-info">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        {{ message[1:] }}
+                    </div>
+                </div>
+            {% endif %}
         {% endfor %}
     </div>
 
