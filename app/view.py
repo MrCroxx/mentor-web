@@ -11,10 +11,7 @@ from PIL import Image
 from app.models import *
 from datetime import datetime, timedelta
 from config import SUCCESS, BAD
-import os
-import base64
-import math
-import json
+import os, base64, math, json, re
 
 # Configs and View for Login
 
@@ -105,7 +102,7 @@ def info_setpassword():
 def appointment():
     user = User.query.filter(User.id == 16210001).first()
     form = AppointmentNewForm()
-    mens = User.query.filter(User.identify==User.IDENTIFY_MENTOR).all()
+    mens = User.query.filter(User.identify == User.IDENTIFY_MENTOR).all()
     return render_template('appointment.html', mens=mens, form=form)
 
 
@@ -130,7 +127,40 @@ def result_men():
 @app.route('/course/new', methods=['GET', 'POST'])
 @login_required
 def course_new():
-    return render_template('course_new.html')
+    form = CourseNewForm()
+    if current_user.identify == User.IDENTIFY_MENTOR:
+        if form.validate_on_submit():
+            men = current_user
+            name = form.name.data
+            capacity = form.capacity.data
+            department = form.department.data
+            description = form.description.data
+            location = form.location.data
+            time_start_string = form.time_start.data
+            time_end_string = form.time_end.data
+            time_deadline_string = form.time_deadline.data
+
+            match = re.search(r'(\d+)-(\d+)-(\d+) (\d+):(\d+)', time_start_string)
+            y, m, d, h, i = int(match.group(1)), int(match.group(2)), int(match.group(3)), int(match.group(4)), int(
+                match.group(5))
+            time_start = datetime(y, m, d, h, i)
+
+            match = re.search(r'(\d+)-(\d+)-(\d+) (\d+):(\d+)', time_end_string)
+            y, m, d, h, i = int(match.group(1)), int(match.group(2)), int(match.group(3)), int(match.group(4)), int(
+                match.group(5))
+            time_end = datetime(y, m, d, h, i)
+
+            match = re.search(r'(\d+)-(\d+)-(\d+) (\d+):(\d+)', time_deadline_string)
+            y, m, d, h, i = int(match.group(1)), int(match.group(2)), int(match.group(3)), int(match.group(4)), int(
+                match.group(5))
+            time_deadline = datetime(y, m, d, h, i)
+
+            course = Course(name, department, men, capacity, description, location, time_start, time_end, time_deadline)
+            course.update()
+            flash(u'S创建成功!')
+    else:
+        abort(403)
+    return render_template('course_new.html', form=form)
 
 
 # ajax routes
@@ -261,6 +291,38 @@ def ajax_appointment_delete(aid):
         if (appointment is not None) and (appointment.stu == user):
             appointment.delete()
             return jsonify({'statis': SUCCESS})
+        else:
+            return jsonify({'status': BAD})
+    else:
+        return jsonify({'status': BAD})
+
+
+@app.route('/ajax/course/new', methods=['POST'])
+@login_required
+def ajax_course_new():
+    '''
+    创建团体课。使用Ajax提交表单，注意再headers加入X-CSRF-TOKEN，详见app/templates/examples/appointment_new.html中的form_submit方法。
+    （所有的表单都在app.forms.py中，详见里面的类，类名都很直白hhhhh）
+    :return:json:{'status':状态码} 注意除了需要处理状态码还要处理请求失败（error函数）。
+    '''
+    form = CourseNewForm()
+    if current_user.identify == User.IDENTIFY_MENTOR:
+        if form.validate_on_submit():
+            men = current_user
+            name = form.name.data
+            capacity = form.capacity.data
+            department = form.department.data
+            description = form.description.data
+            location = form.location.data
+            time_start = form.time_start.data
+            time_end = form.time_end.data
+            time_deadline = form.time_deadline.data
+
+            course = Course(name, department, men, capacity, description, location, time_start, time_end, time_deadline)
+            course.update()
+
+            return jsonify({'status': SUCCESS})
+
         else:
             return jsonify({'status': BAD})
     else:

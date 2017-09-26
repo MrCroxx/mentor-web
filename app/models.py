@@ -130,6 +130,17 @@ class Course(db.Model):
     time_end = db.Column(db.DateTime)  # 课程结束时间
     time_deadline = db.Column(db.DateTime)  # 选课截至时间
 
+    def __init__(self, name, department, men, capacity, description, location, time_start, time_end, time_deadline):
+        self.name = name
+        self.department = department
+        self.men = men
+        self.capacity = capacity
+        self.description = description
+        self.location = location
+        self.time_start = time_start
+        self.time_end = time_end
+        self.time_deadline = time_deadline
+
     def __lt__(self, other):
         return self.time_start < other.time_start
 
@@ -155,6 +166,8 @@ class User(db.Model):
     salt = db.Column(db.String(8))  # 密码的盐值 防撞库
     passwordhash = db.Column(db.String(64))  # 哈希后的密码
     chpassword = db.Column(db.Boolean)  # 是否修改过密码
+    emall = db.Column(db.String)  # 邮箱地址
+    emall_confirm = db.Column(db.Boolean)  # 邮箱是否认证
     identify = db.Column(db.Integer)  # 身份(学生/教师)
     department = db.Column(db.Integer)  # 部门ID
     title = db.Column(db.String)  # 职称(教师)
@@ -182,6 +195,7 @@ class User(db.Model):
         self.title = title
         self.description = description
         self.chpassword = False
+        self.emall_confirm = False
 
     def update(self):
         db.session.add(self)
@@ -206,6 +220,12 @@ class User(db.Model):
 
     def getDepartmentString(self):
         return department_to_string[self.department]
+
+    def isMen(self):
+        return True if self.identify == User.IDENTIFY_MENTOR else False
+
+    def isStu(self):
+        return True if self.identify == User.IDENTIFY_STUDENT else False
 
     # for flask-login
 

@@ -2,8 +2,8 @@
 
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
-from wtforms import StringField, PasswordField, BooleanField, DecimalField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, NumberRange
+from wtforms import StringField, PasswordField, BooleanField, DecimalField, DateTimeField, IntegerField
+from wtforms.validators import DataRequired, Length, Email, EqualTo, NumberRange, Regexp
 
 
 class LoginForm(FlaskForm):
@@ -65,6 +65,54 @@ class AppointmentNewForm(FlaskForm):
     )
     description = StringField(
         'description',
+    )
+
+
+class CourseNewForm(FlaskForm):
+    name = StringField(
+        'name',
+        validators=[
+            DataRequired(message=u'请输入1-20字符的课程名!'),
+            Length(1, 20, message=u'课程名需要1-20字符!')]
+    )
+    department = IntegerField(
+        'department',
+        validators=[
+            DataRequired(message=u'请选择开课院系!'),
+        ]
+    )
+    capacity = IntegerField(
+        'capacity',
+        validators=[
+            DataRequired(message=u'请输入课程容量!')
+        ]
+    )
+    description = StringField(
+        'description',
+    )
+    location = StringField(
+        'location',
+    )
+    time_start = StringField(
+        'time_start',
+        validators=[
+            DataRequired(message=u'请选择课程开始时间!'),
+            Regexp(r'(\d+)-(\d+)-(\d+) (\d+):(\d+)', message=u'请选择正确的日期与时间!')
+        ]
+    )
+    time_end = StringField(
+        'time_end',
+        validators=[
+            DataRequired(message=u'请选择课程结束时间!'),
+            Regexp(r'(\d+)-(\d+)-(\d+) (\d+):(\d+)', message=u'请选择正确的日期与时间!')
+        ]
+    )
+    time_deadline = StringField(
+        'time_deadline',
+        validators=[
+            DataRequired(message=u'请选择选课结束时间!'),
+            Regexp(r'(\d+)-(\d+)-(\d+) (\d+):(\d+)', message=u'请选择正确的日期与时间!')
+        ]
     )
 
 

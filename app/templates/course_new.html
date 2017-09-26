@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>导师有约 —— 创建团体课</title>
+<link href="/static/lib/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+<script src="/static/lib/js/bootstrap-datetimepicker.min.js"></script>
+<script type="text/javascript" src="/static/lib/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="thumbnail">
+                <div class="caption">
+                    <form class="form-horizontal" method="POST">
+                        <fieldset>
+                            <legend>创建团体课</legend>
+                            {{ form.hidden_tag() }}
+
+                            <div class="form-group">
+                                <label for="name" class="col-md-3 control-label">团体课名称</label>
+                                <div class="col-md-6">
+                                    {{ form.name(class='form-control') }}<br/>
+                                    {% for e in form.name.errors %}
+                                    <span style='color:red'>*{{ e }}</span><br/>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="department" class="col-md-3 control-label">开课院系</label>
+                                <div class="col-md-6">
+                                    <select id="department" name="department" class="form-control">
+                                        <option value="21">21-软件学院</option>
+                                    </select><br/>
+                                    {% for e in form.department.errors %}
+                                    <span style='color:red'>*{{ e }}</span><br/>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="capacity" class="col-md-3 control-label">团体课容量</label>
+                                <div class="col-md-6">
+                                    <input id="capacity" name="capacity" type="number" min="0" step="10" value="0"
+                                           class="form-control"/><br/>
+                                    {% for e in form.capacity.errors %}
+                                    <span style='color:red'>*{{ e }}</span><br/>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="description" class="col-md-3 control-label">团体课简介</label>
+                                <div class="col-md-6">
+                                    <textarea id="description" name="description" rows="6"
+                                              class="form-control"></textarea><br/>
+                                    {% for e in form.description.errors %}
+                                    <span style='color:red'>*{{ e }}</span><br/>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="time_start" class="col-md-3 control-label">课程开始时间</label>
+                                <div class="col-md-6">
+
+                                    <input id="time_start" name="time_start" type="text" class="form-control"><br/>
+
+                                    <script type="text/javascript">
+                                        $("#time_start").datetimepicker({
+                                            format: "yyyy-mm-dd hh:ii",
+                                            autoclose: true,
+                                            todayBtn: true
+                                        });
+                                    </script>
+
+                                    {% for e in form.time_start.errors %}
+                                    <span style='color:red'>*{{ e }}</span><br/>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="time_end" class="col-md-3 control-label">课程结束时间</label>
+                                <div class="col-md-6">
+
+                                    <input id="time_end" name="time_end" type="text" class="form-control"><br/>
+
+                                    <script type="text/javascript">
+                                        $("#time_end").datetimepicker({
+                                            format: "yyyy-mm-dd hh:ii",
+                                            autoclose: true,
+                                            todayBtn: true
+                                        });
+                                    </script>
+
+                                    {% for e in form.time_end.errors %}
+                                    <span style='color:red'>*{{ e }}</span><br/>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="time_deadline" class="col-md-3 control-label">选课结束时间</label>
+                                <div class="col-md-6">
+
+                                    <input id="time_deadline" name="time_deadline" type="text" class="form-control"><br/>
+
+                                    <script type="text/javascript">
+                                        $("#time_deadline").datetimepicker({
+                                            format: "yyyy-mm-dd hh:ii",
+                                            autoclose: true,
+                                            todayBtn: true
+                                        });
+                                    </script>
+
+                                    {% for e in form.time_deadline.errors %}
+                                    <span style='color:red'>*{{ e }}</span><br/>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-6 col-md-offset-3">
+                                    <button type="submit" class="btn btn-primary">提交</button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

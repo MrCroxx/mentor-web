@@ -1,0 +1,13 @@
+#!env/bin/python
+# -*- coding:utf-8 -*-
+from app.models import *
+
+stu1 = User('16211011', '123456', u'孟爻', User.IDENTIFY_STUDENT, 21, '', '')
+stu1.update()
+
+men1 = User('16210001', '123456', u'宋友', User.IDENTIFY_MENTOR, 21, u'副院长',
+            u'我真的是副院长！我真的是副院长！我真的是副院长！我真的是副院长！我真的是副院长！我真的是副院长！我真的是副院长！')
+men1.update()
+men2 = User('16210002', '123456', u'王亚', User.IDENTIFY_MENTOR, 21, u'党委书记',
+            u'我真的是党委书记！我真的是党委书记！我真的是党委书记！我真的是党委书记！我真的是党委书记！我真的是党委书记！')
+men2.update()
