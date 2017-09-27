@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% from 'macros.html' import department_options %}
+
+{% block head %}
+    <title>导师有约 —— 查看预约</title>
+    <link href="/static/lib/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+    <script src="/static/lib/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="/static/lib/js/locales/bootstrap-datetimepicker.zh-CN.js"
+            charset="UTF-8"></script>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2>导师预约</h2>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="panel-title">预约检索</div>
+                            </div>
+
+                            <div class="panel-body">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <h4>检索方式</h4>
+                                            <select id="type" name="type" class="form-control">
+                                                <option value="0" selected="selected">全部预约</option>
+                                                <option value="1">按状态检索</option>
+                                                <option value="2">按学院检索</option>
+                                                <option value="3">按日期检索</option>
+                                            </select>
+                                            <script language="javascript">
+                                                $(document).ready(function () {
+                                                    $('#type_status').hide();
+                                                    $('#type_department').hide();
+                                                    $('#type_time_date').hide();
+                                                    $("#type").change(function () {
+                                                        switch ($("#type").val()) {
+                                                            case "0":
+                                                                $('#type_status').hide();
+                                                                $('#type_department').hide();
+                                                                $('#type_time_date').hide();
+                                                                break;
+                                                            case "1":
+                                                                $('#type_status').show();
+                                                                $('#type_department').hide();
+                                                                $('#type_time_date').hide();
+                                                                break;
+                                                            case "2":
+                                                                $('#type_status').hide();
+                                                                $('#type_department').show();
+                                                                $('#type_time_date').hide();
+                                                                break;
+                                                            case "3":
+                                                                $('#type_status').hide();
+                                                                $('#type_department').hide();
+                                                                $('#type_time_date').show();
+                                                                break;
+                                                        }
+                                                    });
+                                                });
+                                            </script>
+                                        </div>
+                                    </div>
+                                    <div id="type_status" class="row">
+                                        <div class="col-md-12">
+                                            <h4>状态</h4>
+                                            <select id="status" name="status" class="form-control">
+                                                <option value="0">未审核</option>
+                                                <option value="1">通过</option>
+                                                <option value="2">拒绝</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div id="type_department" class="row">
+                                        <div class="col-md-12">
+                                            <h4>学院</h4>
+                                            <select id="department" name="department" class="form-control">
+                                                {{ department_options() }}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div id="type_time_date" class="row">
+                                        <div class="col-md-12">
+                                            <h4>日期</h4>
+                                            <input id="time_date_string" name="time_date_string" type="text"
+                                                   class="form-control"><br/>
+
+                                            <script type="text/javascript">
+                                                $("#time_date_string").datetimepicker({
+                                                    format: "yyyy-mm-dd",
+                                                    autoclose: true,
+                                                    todayBtn: true,
+                                                    minView: 2,
+                                                    maxView: 4,
+                                                    todayHighlight: true
+                                                });
+                                            </script>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div id='query' onclick="ajax_query()" class="btn btn-primary"
+                                             style="width: 100%">搜索
+                                        </div>
+                                        <script>
+                                            var csrftoken = "{{ csrf_token()|safe }}";
+
+                                            function ajax_query() {
+                                                url = "/ajax/appointment/query/" + $("#type").val();
+                                                data = "";
+                                                data += "&status=" + $("#status").val();
+                                                data += "&department=" + $("#department").val();
+                                                data += "&time_date_string=" + $("#time_date_string").val();
+                                                $.ajax({
+                                                    type: "POST",
+                                                    url: url,
+                                                    data: data,
+                                                    dataType: 'json',
+                                                    async: false,
+                                                    beforeSend: function (xhr, settings) {
+                                                        xhr.setRequestHeader("X-CSRFToken", csrftoken)
+                                                    },
+                                                    error: function (request) {
+                                                        alert("获取失败![网络错误]");
+                                                    },
+                                                    success: function (data) {
+                                                        if (data.status == 20000) {
+                                                            $('#table_appointments tbody').empty();
+                                                            appointments = data.content;
+                                                            for (i = 0; i < mentors.length; i++) {
+                                                                appointment = appointment[i];
+                                                                button = "<a href=\"/appointment/new/" + mentor.id + "\" class=\"btn btn-primary btn-sm\">预约</a>"
+                                                                var row = "<tr>"
+                                                                    + "<td>" + mentor.name + "</td>"
+                                                                    + "<td>" + mentor.department + "(" + mentor.title + ")" + "</td>"
+                                                                    + "<td>" + mentor.appointment_num + "</td>"
+                                                                    + "<td>" + mentor.score + "%" + "</td>"
+                                                                    + "<td>" + button + "</td>"
+                                                                    + "</tr>";
+                                                                $('#table_appointments tbody').append(row);
+                                                            }
+                                                        } else {
+                                                            alert("获取失败![数据错误]");
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        </script>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <table id="table_appointments" class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th class="col-md-2">学生学号</th>
+                                <th class="col-md-1">学号姓名</th>
+                                <th class="col-md-2">预约日期</th>
+                                <th class="col-md-2">预约原因</th>
+                                <th class="col-md-1">预约状态</th>
+                                <th class="col-md-2">回复</th>
+                                <th class="col-md-1">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}

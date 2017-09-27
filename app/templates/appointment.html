@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from 'macros.html' import user_block,user_block_detail,user_block_with_modal_appointment_new %}
+{% from 'macros.html' import department_options %}
 
 {% block head %}
     <title>导师有约 —— 导师预约</title>
@@ -12,21 +12,102 @@
             <div class="col-md-12">
                 <div class="row">
                     <div class="col-md-12">
-                        <h2>可预约导师</h2>
+                        <h2>导师预约</h2>
                     </div>
                 </div>
 
                 <div class="row">
-                    {% for user in mens %}
-                        <div class="col-md-4">
-                            {{ user_block_with_modal_appointment_new(user,form) }}
+                    <div class="col-md-12">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="panel-title">导师检索</div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h4>学院</h4>
+                                        <select id="department" name="department" class="form-control">
+                                            {{ department_options() }}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div id='query' onclick="ajax_query()" class="btn btn-primary"
+                                             style="width: 100%">搜索
+                                        </div>
+                                        <script>
+                                            var csrftoken = "{{ csrf_token()|safe }}";
+
+                                            function ajax_query() {
+                                                $.ajax({
+                                                    type: "POST",
+                                                    url: "/ajax/mentor/query",
+                                                    data: "department=" + $('#department').val(),
+                                                    dataType: 'json',
+                                                    async: false,
+                                                    beforeSend: function (xhr, settings) {
+                                                        xhr.setRequestHeader("X-CSRFToken", csrftoken)
+                                                    },
+                                                    error: function (request) {
+                                                        alert("获取失败![网络错误]");
+                                                    },
+                                                    success: function (data) {
+                                                        if (data.status == 20000) {
+                                                            $('#table_mentors tbody').empty();
+                                                            mentors = data.content;
+                                                            for (i = 0; i < mentors.length; i++) {
+                                                                mentor = mentors[i];
+                                                                button = "<a href=\"/appointment/new/" + mentor.id + "\" class=\"btn btn-primary btn-sm\">预约</a>"
+                                                                var row = "<tr>"
+                                                                    + "<td>" + mentor.name + "</td>"
+                                                                    + "<td>" + mentor.department + "(" + mentor.title + ")" + "</td>"
+                                                                    + "<td>" + mentor.appointment_num + "</td>"
+                                                                    + "<td>" + mentor.score + "%" + "</td>"
+                                                                    + "<td>" + button + "</td>"
+                                                                    + "</tr>";
+                                                                $('#table_mentors tbody').append(row);
+                                                            }
+                                                        } else {
+                                                            alert("获取失败![数据错误]");
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        </script>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    {% endfor %}
+                    </div>
                 </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <table id="table_mentors" class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th class="col-md-2">教师姓名</th>
+                                <th class="col-md-3">院系(职务)</th>
+                                <th class="col-md-2">预约数</th>
+                                <th class="col-md-2">好评度</th>
+                                <th class="col-md-3">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
 
             </div>
         </div>
     </div>
+
 
 
 {% endblock %}

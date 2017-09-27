@@ -56,16 +56,53 @@ class SetPasswordForm(FlaskForm):
     )
 
 
-class AppointmentNewForm(FlaskForm):
-    men_id = StringField(
-        'men_id',
+class MentorQueryForm(FlaskForm):
+    department = IntegerField(
+        'department',
         validators=[
-            Length(4, 10)
         ]
     )
+
+
+class AppointmentNewForm(FlaskForm):
     description = StringField(
         'description',
     )
+    time_date_string = StringField(
+        'time_date_string',
+        validators=[
+            DataRequired(message=u'请选择预约时间!'),
+            Regexp(r'(\d+)-(\d+)-(\d+)', message=u'请选择正确的日期!')
+        ]
+    )
+
+class AppointmentQueryByDepartment(FlaskForm):
+    department = IntegerField(
+        'department',
+        validators=[
+            DataRequired()
+        ]
+    )
+
+class AppointmentQueryByStatus(FlaskForm):
+    status = IntegerField(
+        'status',
+        validators=[
+            DataRequired()
+        ]
+    )
+
+class AppointmentQueryByDate(FlaskForm):
+    time_date_string = StringField(
+        'time_date_string',
+        validators=[
+            DataRequired(),
+            Regexp(r'(\d+)-(\d+)-(\d+)')
+        ]
+    )
+
+# old
+
 
 
 class CourseNewForm(FlaskForm):

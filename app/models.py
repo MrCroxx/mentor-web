@@ -2,7 +2,7 @@
 from random import Random
 import hashlib
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from app import db
 
 
@@ -59,29 +59,30 @@ relation_course_student = db.Table('relation_course_student',
 
 class Appointment(db.Model):
     __tablename__ = 'Appointment'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 团体课id 自增主键
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 预约id 自增主键
     stu_id = db.Column(db.Integer, db.ForeignKey('User.id'))  # 外键 学生id
     men_id = db.Column(db.Integer, db.ForeignKey('User.id'))  # 外键 导师id
     status = db.Column(db.Integer)  # 申请状态
     description = db.Column(db.String)  # 申请理由
+    time_appointment = db.Column(db.Date)  # 预约时间
     replytext = db.Column(db.String)  # 审批理由
+    location = db.Column(db.String)  # 预约教室
     time_submit = db.Column(db.DateTime)  # 申请时间
     time_reply = db.Column(db.DateTime)  # 审批时间
-    location = db.Column(db.String)  # 预约教室
-    time_start = db.Column(db.DateTime)  # 预约开始时间
-    time_end = db.Column(db.DateTime)  # 预约结束时间
+    score = db.Column(db.Float)  # 预约评分
 
     # 常量
     STATUS_WAITING = 0
     STATUS_PASS = 1
     STATUS_DENY = 2
 
-    def __init__(self, stu, men, description):
+    def __init__(self, stu, men, description, time_date):
         self.stu = stu
         self.men = men
         self.description = description
         self.status = Appointment.STATUS_WAITING
         self.time_submit = datetime.now()
+        self.time_date = time_date
 
     def toDict(self):
         return {
@@ -92,10 +93,10 @@ class Appointment(db.Model):
             'mentor_name': self.men.name,
             'time_submit': self.time_submit.strftime('%Y-%m-%d %H:%M:%S') if self.time_submit else u'暂无数据',
             'time_reply': self.time_reply.strftime('%Y-%m-%d %H:%M:%S') if self.time_reply else u'暂无数据',
-            'time_start': self.time_start.strftime('%Y-%m-%d %H:%M:%S') if self.time_start else u'暂无数据',
-            'tiem_end': self.tiem_end.strftime('%Y-%m-%d %H:%M:%S') if self.tiem_end else u'暂无数据',
             'description': self.description,
             'replytext': self.replytext,
+            'location': self.location,
+            'time_date': self.time_date.strftime("%Y-%m-%d") if self.time_date else u'暂无数据',
         }
 
     def __lt__(self, other):
@@ -105,9 +106,11 @@ class Appointment(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    def reply(self, status, replytext):
+    def reply(self, status, replytext, location):
         self.status = status
         self.replytext = replytext
+        self.location = location
+        self.time_reply = datetime.now()
         self.update()
 
     def delete(self):
@@ -181,6 +184,7 @@ class User(db.Model):
     department = db.Column(db.Integer)  # 部门ID
     title = db.Column(db.String)  # 职称(教师)
     description = db.Column(db.String)  # 简介(教师)
+    score = db.Column(db.Float)  # 评分
 
     appointments_stu = db.relationship('Appointment', backref='stu', foreign_keys=[Appointment.stu_id])
     # 一对多 预约(学生)
@@ -205,6 +209,18 @@ class User(db.Model):
         self.description = description
         self.chpassword = False
         self.emall_confirm = False
+        self.score = 0
+
+    def toDict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'department': department_to_string[self.department],
+            'title': self.title,
+            'description': self.description,
+            'appointment_num': len(self.appointments_men),
+            'score': self.score,
+        }
 
     def update(self):
         db.session.add(self)

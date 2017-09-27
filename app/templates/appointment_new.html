@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>导师有约 —— 创建预约</title>
+    <link href="/static/lib/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+    <script src="/static/lib/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="/static/lib/js/locales/bootstrap-datetimepicker.zh-CN.js"
+            charset="UTF-8"></script>
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="thumbnail">
+                    <div class="caption">
+                        <form class="form-horizontal" method="post">
+                            <fieldset>
+                                <legend>创建预约</legend>
+                                {{ form.hidden_tag() }}
+                                <div class="form-group">
+                                    <label for="date" class="col-md-3 control-label">预约日期</label>
+                                    <div class="col-md-6">
+                                        <input id="time_date_string" name="time_date_string" type="text"
+                                               class="form-control"><br/>
+
+                                        <script type="text/javascript">
+                                            $("#time_date_string").datetimepicker({
+                                                format: "yyyy-mm-dd",
+                                                autoclose: true,
+                                                todayBtn: true,
+                                                startDate: new Date(),
+                                                minView: 2,
+                                                maxView: 4,
+                                                todayHighlight: true
+                                            });
+                                        </script>
+
+                                        {% for e in form.time_date_string.errors %}
+                                            <span style='color:red'>*{{ e }}</span><br/>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="description" class="col-md-3 control-label">预约原因</label>
+                                    <div class="col-md-6">
+                                        <textarea id="description" name="description" class="form-control"
+                                                  rows="3"></textarea>
+                                        {% for e in form.description.errors %}
+                                            <span style='color:red'>*{{ e }}</span><br/>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-6 col-md-offset-3">
+                                        <button type="submit" class="btn btn-primary">提交</button>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

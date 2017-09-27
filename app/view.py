@@ -97,14 +97,55 @@ def info_setpassword():
     return render_template('info_setpassword.html', form=form)
 
 
-@app.route('/appointment')
+@app.route('/appointment', methods=['GET'])
 @login_required
 def appointment():
     if current_user.identify == User.IDENTIFY_MENTOR:
         abort(403)
+    return render_template('appointment.html')
+
+
+@app.route('/appointment/new/<men_id>', methods=['GET', 'POST'])
+@login_required
+def appointment_new(men_id):
+    user = current_user
+    if user == User.IDENTIFY_MENTOR:
+        abort(403)
     form = AppointmentNewForm()
-    mens = User.query.filter(User.identify == User.IDENTIFY_MENTOR).all()
-    return render_template('appointment.html', mens=mens, form=form)
+    if form.validate_on_submit():
+        description = form.description.data
+        time_date_string = form.time_date_string.data
+
+        men = User.query.filter(User.id == men_id).filter(User.identify == User.IDENTIFY_MENTOR).first()
+
+        match = re.search(r'(\d+)-(\d+)-(\d+)', time_date_string)
+        y, m, d = int(match.group(1)), int(match.group(2)), int(match.group(3))
+        time_date = date(y, m, d)
+
+        if men_id is not None:
+            if time_date >= datetime.now().date():
+                appointment = Appointment(user, men, description, time_date)
+                appointment.update()
+                print 'success!'
+                flash(u'S预约成功!')
+                return redirect(url_for('appointment'))
+            else:
+                flash(u'D非法的日期!')
+        else:
+            flash(u'D该导师不存在!')
+    return render_template('appointment_new.html', form=form)
+
+
+@app.route('/appointment/men', methods=['GET'])
+@login_required
+def appointment_men():
+    user = current_user
+    if user.identify == User.IDENTIFY_STUDENT:
+        abort(403)
+    return render_template('appointment_men.html')
+
+
+# view old
 
 
 @app.route('/course', methods=['GET'])
@@ -181,6 +222,33 @@ def getIdentifyingcode():
     return jsonify({'code_uri': code_uri})
 
 
+@app.route('/ajax/mentor/query', methods=['POST'])
+@login_required
+def ajax_mentor_query():
+    user = current_user
+    if user.identify == User.IDENTIFY_MENTOR:
+        abort(403)
+    form = MentorQueryForm()
+    if form.validate_on_submit():
+        department = int(form.department.data)
+        if department == 0:
+            mentors = User.query.filter(User.identify == User.IDENTIFY_MENTOR).all()
+        else:
+            mentors = user.query.filter(User.identify == User.IDENTIFY_MENTOR).filter(
+                User.department == department).all()
+        mentors_dict = [mentor.toDict() for mentor in mentors]
+        return jsonify({'status': SUCCESS, 'content': mentors_dict})
+    else:
+        return jsonify({'status': BAD})
+
+
+@app.route('/ajax/appointment/query/<type>',methods=['POST'])
+@login_required
+def ajax_appointment_query(type):
+    pass
+
+
+# ajax old
 @app.route('/ajax/appointment/list/<offset>', methods=['GET', 'POST'])
 @login_required
 def ajax_appointment_list(offset):
