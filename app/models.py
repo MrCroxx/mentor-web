@@ -120,6 +120,7 @@ class Appointment(db.Model):
         self.status = Appointment.STATUS_WAITING
         self.time_submit = datetime.now()
         self.time_date = time_date
+        self.score = 0
 
     def toDict(self):
         return {
@@ -135,6 +136,7 @@ class Appointment(db.Model):
             'replytext': self.replytext if self.replytext else u'暂无数据',
             'location': self.location if self.location else u'暂无数据',
             'time_date': self.time_date.strftime("%Y-%m-%d") if self.time_date else u'暂无数据',
+            'score': self.score,
         }
 
     def __lt__(self, other):
@@ -154,6 +156,14 @@ class Appointment(db.Model):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
+
+    def canScore(self):
+        # return (datetime.now().date() > self.time_date) and (self.status == Appointment.STATUS_PASS) and (self.score==0)
+        return (self.status == Appointment.STATUS_PASS) and (self.score == 0)
+
+    def setScore(self, score):
+        self.score = score
+        self.update()
 
 
 class Course(db.Model):

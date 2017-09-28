@@ -357,6 +357,23 @@ def ajax_appointment_query(type):
     return jsonify({'status': SUCCESS, 'content': appointments_dict})
 
 
+@app.route('/ajax/appointment/<aid>/score', methods=['POST'])
+@login_required
+def ajax_appointment_score(aid):
+    user = current_user
+    appointment = Appointment.query.filter(Appointment.id == aid).first()
+    if appointment is not None:
+        if appointment.stu.id == user.id:
+            score = request.form.get('score', 0)
+            score = int(score)
+            appointment.setScore(score)
+            return jsonify({'status': SUCCESS})
+        else:
+            return jsonify({'status': BAD})
+    else:
+        return jsonify({'status': BAD})
+
+
 # ajax old
 @app.route('/ajax/appointment/list/<offset>', methods=['GET', 'POST'])
 @login_required

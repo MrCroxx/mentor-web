@@ -2,11 +2,8 @@
 
 {% block head %}
     <title>导师有约 —— 查看预约单</title>
-    <link href="/static/lib/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
-    <script src="/static/lib/js/bootstrap-datetimepicker.min.js"></script>
-    <script type="text/javascript" src="/static/lib/js/locales/bootstrap-datetimepicker.zh-CN.js"
-            charset="UTF-8"></script>
-
+    <link href="/static/lib/css/bootstrap-slider.min.css" rel="stylesheet"/>
+    <script src="/static/lib/js/bootstrap-slider.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -107,6 +104,89 @@
                                 </div>
                             </div>
                         </div>
+                        {% if appointment.canScore() %}
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="panel-primary">
+                                        <div class="panel-heading">
+                                            <div class="panel-title">评分</div>
+                                        </div>
+                                        <div class="panel-body">
+
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <h4>评分 : </h4>
+                                                </div>
+                                                <div class="col-md-9">
+                                                    <input id="score" name="score" type="text"
+                                                           data-slider-ticks="[20, 40, 60, 80, 100]"
+                                                           data-slider-ticks-snap-bounds="30"
+                                                           data-slider-ticks-labels='["非常失望", "失望", "一般", "满意", "非常满意"]'/>
+                                                    <script>
+                                                        $("#score").slider({
+                                                            ticks: [20, 40, 60, 80, 100],
+                                                            ticks_labels: ["非常失望", "失望", "一般", "满意", "非常满意"],
+                                                            ticks_snap_bounds: 30
+                                                        });
+                                                    </script>
+                                                    <br/><br/>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div onclick="score_submit()" class="btn btn-success"
+                                                         style="width: 100%">提交评分
+                                                    </div>
+                                                    <script>
+                                                        var csrftoken = "{{ csrf_token()|safe }}";
+
+                                                        function score_submit() {
+                                                            $.post({
+                                                                url: "/ajax/appointment/{{ appointment.id|safe }}/score",
+                                                                data: "score=" + $("#score").val(),
+                                                                async: false,
+                                                                beforeSend: function (xhr, settings) {
+                                                                    xhr.setRequestHeader("X-CSRFToken", csrftoken)
+                                                                },
+                                                                error: function (request) {
+                                                                    alert("评分失败![网络错误]");
+                                                                },
+                                                                success: function (data) {
+                                                                    if (data.status == 20000) {
+                                                                        alert("评分成功!");
+                                                                    }
+                                                                    else {
+                                                                        alert("评分失败![数据错误]");
+                                                                    }
+                                                                }
+                                                            });
+                                                        }
+                                                    </script>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% elif appointment.score != 0 %}
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="panel-primary">
+                                        <div class="panel-heading">
+                                            <div class="panel-title">评分</div>
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <h4>评分 : {{ appointment.score }}</h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
                     </div>
                 </div>
             </div>
