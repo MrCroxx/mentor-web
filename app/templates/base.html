@@ -48,7 +48,7 @@
                             {% if current_user.isStu() %}
                                 <li><a href="/appointment"><span class="glyphicon glyphicon-plus"></span>预约导师</a></li>
                                 <li><a href="/course"><span class="glyphicon glyphicon-plus"></span>预约团体课</a></li>
-                                <li><a href="/result/stu"><span class="glyphicon glyphicon-cog"></span>查看结果</a>
+                                <li><a href="/appointment/stu"><span class="glyphicon glyphicon-cog"></span>查看预约</a>
                                 </li>
                             {% elif current_user.isMen() %}
                                 <li><a href="/course/new"><span class="glyphicon glyphicon-plus"></span>创建团体课</a></li>

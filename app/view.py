@@ -128,7 +128,7 @@ def appointment_new(men_id):
                 appointment.update()
                 print 'success!'
                 flash(u'S预约成功!')
-                return redirect(url_for('appointment'))
+                return redirect(url_for('appointment_stu'))
             else:
                 flash(u'D非法的日期!')
         else:
@@ -148,12 +148,41 @@ def appointment_exa(aid):
     form = AppointmentReplyForm()
     if form.validate_on_submit():
         if appointment.status == Appointment.STATUS_WAITING:
-            status = form.status.data
-            replytext = form.replytext.data
-            appointment.reply(status, replytext, '')
-            flash(u'S审批成功!')
+            if appointment.men.id == user.id:
+                status = form.status.data
+                replytext = form.replytext.data
+                appointment.reply(status, replytext, '')
+                flash(u'S审批成功!')
             return redirect(url_for('appointment_men'))
     return render_template('appointment_exa.html', appointment=appointment, form=form)
+
+
+@app.route('/appointment/<aid>/view', methods=['GET', 'POST'])
+@login_required
+def appointment_view(aid):
+    user = current_user
+    if user.identify == User.IDENTIFY_MENTOR:
+        abort(403)
+    appointment = Appointment.query.filter(Appointment.id == aid).first()
+    if appointment is None:
+        abort(404)
+    return render_template('appointment_view.html', appointment=appointment)
+
+
+@app.route('/appointment/<aid>/delete', methods=['GET'])
+@login_required
+def appointment_delete(aid):
+    user = current_user
+    if user.identify == User.IDENTIFY_MENTOR:
+        abort(403)
+    appointment = Appointment.query.filter(Appointment.id == aid).first()
+    if appointment is None:
+        abort(404)
+    if appointment.stu.id != user.id:
+        abort(403)
+    appointment.delete()
+    flash(u'S删除成功!')
+    return redirect(url_for('appointment_stu'))
 
 
 @app.route('/appointment/men', methods=['GET'])
@@ -163,6 +192,15 @@ def appointment_men():
     if user.identify == User.IDENTIFY_STUDENT:
         abort(403)
     return render_template('appointment_men.html')
+
+
+@app.route('/appointment/stu', methods=['GET'])
+@login_required
+def appointment_stu():
+    user = current_user
+    if user.identify == User.IDENTIFY_MENTOR:
+        abort(403)
+    return render_template('appointment_stu.html')
 
 
 # view old
