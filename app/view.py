@@ -136,6 +136,26 @@ def appointment_new(men_id):
     return render_template('appointment_new.html', form=form)
 
 
+@app.route('/appointment/<aid>/exa', methods=['GET', 'POST'])
+@login_required
+def appointment_exa(aid):
+    user = current_user
+    if user.identify == User.IDENTIFY_STUDENT:
+        abort(403)
+    appointment = Appointment.query.filter(Appointment.id == aid).first()
+    if appointment is None:
+        abort(404)
+    form = AppointmentReplyForm()
+    if form.validate_on_submit():
+        if appointment.status == Appointment.STATUS_WAITING:
+            status = form.status.data
+            replytext = form.replytext.data
+            appointment.reply(status, replytext, '')
+            flash(u'S审批成功!')
+            return redirect(url_for('appointment_men'))
+    return render_template('appointment_exa.html', appointment=appointment, form=form)
+
+
 @app.route('/appointment/men', methods=['GET'])
 @login_required
 def appointment_men():
@@ -242,10 +262,61 @@ def ajax_mentor_query():
         return jsonify({'status': BAD})
 
 
-@app.route('/ajax/appointment/query/<type>',methods=['POST'])
+@app.route('/ajax/appointment/query/<type>', methods=['POST'])
 @login_required
 def ajax_appointment_query(type):
-    pass
+    user = current_user
+    appointments = []
+    identify = user.identify
+    type = int(type)
+    if type == 0:
+        if user.identify == User.IDENTIFY_MENTOR:
+            appointments = sorted(user.appointments_men, key=lambda appointment: appointment.time_date, reverse=True)
+        elif user.identify == User.IDENTIFY_STUDENT:
+            appointments = sorted(user.appointments_stu, key=lambda appointment: appointment.time_date, reverse=True)
+    elif type == 1:
+        form = AppointmentQueryByStatusForm()
+        if form.validate_on_submit():
+            status = form.status.data
+            if user.identify == User.IDENTIFY_MENTOR:
+                appointments = Appointment.query.filter(Appointment.men_id == user.id).filter(
+                    Appointment.status == status).order_by(desc(Appointment.time_date)).all()
+            elif user.identify == User.IDENTIFY_STUDENT:
+                appointments = Appointment.query.filter(Appointment.stu_id == user.id).filter(
+                    Appointment.status == status).order_by(desc(Appointment.time_date)).all()
+        else:
+            return jsonify({'status': BAD})
+    elif type == 2:
+        form = AppointmentQueryByDepartmentForm()
+        if form.validate_on_submit():
+            department = form.department.data
+            if user.identify == User.IDENTIFY_MENTOR:
+                appointments = Appointment.query.filter(Appointment.men_id == user.id).join(
+                    User.appointments_men).filter(User.department == department).order_by(
+                    desc(Appointment.time_submit)).all()
+            elif user.identify == User.IDENTIFY_STUDENT:
+                appointments = Appointment.query.filter(Appointment.stu_id == user.id).join(
+                    User.appointments_stu).filter(User.department == department).order_by(
+                    desc(Appointment.time_submit)).all()
+        else:
+            return jsonify({'status': BAD})
+    elif type == 3:
+        form = AppointmentQueryByDateForm()
+        if form.validate_on_submit():
+            time_date_string = form.time_date_string.data
+            match = re.search(r'(\d+)-(\d+)-(\d+)', time_date_string)
+            y, m, d = int(match.group(1)), int(match.group(2)), int(match.group(3))
+            time_date = date(y, m, d)
+            if user.identify == User.IDENTIFY_MENTOR:
+                appointments = Appointment.query.filter(Appointment.men_id == user.id).filter(
+                    Appointment.time_date == time_date).order_by(desc(Appointment.time_date)).all()
+            elif user.identify == User.IDENTIFY_STUDENT:
+                appointments = Appointment.query.filter(Appointment.stu_id == user.id).filter(
+                    Appointment.time_date == time_date).order_by(desc(Appointment.time_date)).all()
+        else:
+            return jsonify({'status': BAD})
+    appointments_dict = [appointment.toDict() for appointment in appointments]
+    return jsonify({'status': SUCCESS, 'content': appointments_dict})
 
 
 # ajax old

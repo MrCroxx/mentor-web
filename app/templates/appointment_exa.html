@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>导师有约 —— 审批预约</title>
+    <link href="/static/lib/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+    <script src="/static/lib/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="/static/lib/js/locales/bootstrap-datetimepicker.zh-CN.js"
+            charset="UTF-8"></script>
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="thumbnail">
+                    <div class="caption">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h3>学生{{ appointment.stu.name }}的预约单</h3>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel-primary">
+                                    <div class="panel-heading">
+                                        <div class="panel-title">个人信息</div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <p>学号 : {{ appointment.stu.id }}</p>
+                                                <p>姓名 : {{ appointment.stu.name }}</p>
+                                                <p>学院 : {{ appointment.stu.getDepartmentString() }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel-primary">
+                                    <div class="panel-heading">
+                                        <div class="panel-title">预约信息</div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h4>预约时间 : {{ appointment.time_date.strftime("%Y-%m-%d") }}</h4>
+                                                <h4>预约原因 : </h4>
+                                                <p>{{ appointment.description }}</p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel-primary">
+                                    <div class="panel-heading">
+                                        <div class="panel-title">审批信息</div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                {% if appointment.status == 0 %}
+                                                    <form id="form-reply" class="form-horizontal" method="post">
+                                                        <fieldset>
+                                                            {{ form.hidden_tag() }}
+                                                            <div class="form-group">
+                                                                <label for="replytext"
+                                                                       class="col-md-3 control-label">导师批注</label>
+                                                                <div class="col-md-6">
+                                        <textarea id="replytext" name="replytext" class="form-control"
+                                                  rows="3"></textarea>
+                                                                    {% for e in form.replytext.errors %}
+                                                                        <span style='color:red'>*{{ e }}</span><br/>
+                                                                    {% endfor %}
+                                                                </div>
+                                                            </div>
+                                                            <input id="status" name="status" class="hidden">
+                                                            <div class="form-group">
+                                                                <div class="col-md-6 col-md-offset-3">
+                                                                    <button onclick="form_submit(1)"
+                                                                            class="btn btn-primary">
+                                                                        通过
+                                                                    </button>
+                                                                    <button onclick="form_submit(2)"
+                                                                            class="btn btn-danger">
+                                                                        拒绝
+                                                                    </button>
+                                                                    <script>
+                                                                        var csrftoken = "{{ csrf_token()|safe }}";
+
+                                                                        function form_submit(status) {
+                                                                            $("#status").val(status);
+                                                                            $.post({
+                                                                                url: "/ajax/appointment/{{ appointment.id|safe }}/exa",
+                                                                                data: $("#form-reply").serialize(),
+                                                                                async: false
+                                                                            });
+                                                                        }
+                                                                    </script>
+                                                                </div>
+                                                            </div>
+                                                        </fieldset>
+                                                    </form>
+                                                {% else %}
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <h4>
+                                                                审批结果 :
+                                                                {% if appointment.status==1 %}
+                                                                    <span style="color: green">通过</span>
+                                                                {% elif appointment.status==1 %}
+                                                                    <span style="color: red">拒绝</span>
+                                                                {% endif %}
+                                                            </h4>
+                                                            <h4>导师批注 : </h4>
+                                                            <p>{{ appointment.replytext }}</p>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

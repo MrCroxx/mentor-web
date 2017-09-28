@@ -138,14 +138,27 @@
                                                         if (data.status == 20000) {
                                                             $('#table_appointments tbody').empty();
                                                             appointments = data.content;
-                                                            for (i = 0; i < mentors.length; i++) {
-                                                                appointment = appointment[i];
-                                                                button = "<a href=\"/appointment/new/" + mentor.id + "\" class=\"btn btn-primary btn-sm\">预约</a>"
+                                                            for (i = 0; i < appointments.length; i++) {
+                                                                appointment = appointments[i];
+                                                                statustext = "";
+                                                                button = "";
+                                                                if (appointment.status == 0) {
+                                                                    statustext = "<span style=\"color: blue\">未审核</span>";
+                                                                    button = "<a href=\"/appointment/" + appointment.id + "/exa" + "\" class=\"btn btn-primary btn-sm\">审批</a>";
+                                                                } else if (appointment.status == 1) {
+                                                                    statustext = "<span style=\"color: green\">通过</span>";
+                                                                    button = "<a href=\"/appointment/" + appointment.id + "/exa" + "\" class=\"btn btn-default btn-sm\">查看</a>";
+                                                                } else if (appointment.status == 2) {
+                                                                    statustext = "<span style=\"color: red\">拒绝</span>";
+                                                                    button = "<a href=\"/appointment/" + appointment.id + "/exa" + "\" class=\"btn btn-default btn-sm\">查看</a>";
+                                                                }
                                                                 var row = "<tr>"
-                                                                    + "<td>" + mentor.name + "</td>"
-                                                                    + "<td>" + mentor.department + "(" + mentor.title + ")" + "</td>"
-                                                                    + "<td>" + mentor.appointment_num + "</td>"
-                                                                    + "<td>" + mentor.score + "%" + "</td>"
+                                                                    + "<td>" + appointment.stu_id + "</td>"
+                                                                    + "<td>" + appointment.stu_name + "</td>"
+                                                                    + "<td>" + appointment.time_date + "</td>"
+                                                                    + "<td>" + appointment.description + "</td>"
+                                                                    + "<td>" + statustext + "</td>"
+                                                                    + "<td>" + appointment.replytext + "</td>"
                                                                     + "<td>" + button + "</td>"
                                                                     + "</tr>";
                                                                 $('#table_appointments tbody').append(row);
@@ -169,13 +182,13 @@
                         <table id="table_appointments" class="table table-striped">
                             <thead>
                             <tr>
-                                <th class="col-md-2">学生学号</th>
+                                <th class="col-md-1">学生学号</th>
                                 <th class="col-md-1">学号姓名</th>
-                                <th class="col-md-2">预约日期</th>
-                                <th class="col-md-2">预约原因</th>
+                                <th class="col-md-1">预约日期</th>
+                                <th class="col-md-3">预约原因</th>
                                 <th class="col-md-1">预约状态</th>
-                                <th class="col-md-2">回复</th>
-                                <th class="col-md-1">操作</th>
+                                <th class="col-md-3">回复</th>
+                                <th class="col-md-2">操作</th>
                             </tr>
                             </thead>
                             <tbody>

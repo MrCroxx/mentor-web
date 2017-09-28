@@ -2,7 +2,7 @@
 
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
-from wtforms import StringField, PasswordField, BooleanField, DecimalField, DateTimeField, IntegerField
+from wtforms.fields import StringField, PasswordField, BooleanField, IntegerField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, NumberRange, Regexp
 
 
@@ -76,7 +76,8 @@ class AppointmentNewForm(FlaskForm):
         ]
     )
 
-class AppointmentQueryByDepartment(FlaskForm):
+
+class AppointmentQueryByDepartmentForm(FlaskForm):
     department = IntegerField(
         'department',
         validators=[
@@ -84,15 +85,17 @@ class AppointmentQueryByDepartment(FlaskForm):
         ]
     )
 
-class AppointmentQueryByStatus(FlaskForm):
+
+class AppointmentQueryByStatusForm(FlaskForm):
     status = IntegerField(
         'status',
         validators=[
-            DataRequired()
+            # DataRequired()
         ]
     )
 
-class AppointmentQueryByDate(FlaskForm):
+
+class AppointmentQueryByDateForm(FlaskForm):
     time_date_string = StringField(
         'time_date_string',
         validators=[
@@ -100,6 +103,22 @@ class AppointmentQueryByDate(FlaskForm):
             Regexp(r'(\d+)-(\d+)-(\d+)')
         ]
     )
+
+
+class AppointmentReplyForm(FlaskForm):
+    replytext = StringField(
+        'replytext',
+        validators=[
+
+        ]
+    )
+    status = IntegerField(
+        'status',
+        validators=[
+            DataRequired()
+        ]
+    )
+
 
 # old
 
