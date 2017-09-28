@@ -3,10 +3,9 @@
 
 {% block head %}
     <title>导师有约 —— 查看预约</title>
-    <link href="/static/lib/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
-    <script src="/static/lib/js/bootstrap-datetimepicker.min.js"></script>
-    <script type="text/javascript" src="/static/lib/js/locales/bootstrap-datetimepicker.zh-CN.js"
-            charset="UTF-8"></script>
+    <link href="/static/lib/css/datepicker.min.css" rel="stylesheet">
+    <script src="/static/lib/js/datepicker.min.js"></script>
+    <script src="/static/lib/js/datepicker.zh-CN.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -96,13 +95,10 @@
                                                    class="form-control"><br/>
 
                                             <script type="text/javascript">
-                                                $("#time_date_string").datetimepicker({
+                                                $("#time_date_string").datepicker({
+                                                    autoHide: true,
                                                     format: "yyyy-mm-dd",
-                                                    autoclose: true,
-                                                    todayBtn: true,
-                                                    minView: 2,
-                                                    maxView: 4,
-                                                    todayHighlight: true
+                                                    language: 'zh-CN'
                                                 });
                                             </script>
                                         </div>
