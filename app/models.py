@@ -163,6 +163,9 @@ class Appointment(db.Model):
 
     def setScore(self, score):
         self.score = score
+        self.men.score_all += score
+        self.men.score_times += 1
+        self.men.update()
         self.update()
 
 
@@ -232,7 +235,8 @@ class User(db.Model):
     department = db.Column(db.Integer)  # 部门ID
     title = db.Column(db.String)  # 职称(教师)
     description = db.Column(db.String)  # 简介(教师)
-    score = db.Column(db.Float)  # 评分
+    score_all = db.Column(db.Float)  # 评分(总)
+    score_times = db.Column(db.Integer)  # 评分次数
 
     appointments_stu = db.relationship('Appointment', backref='stu', foreign_keys=[Appointment.stu_id])
     # 一对多 预约(学生)
@@ -257,7 +261,8 @@ class User(db.Model):
         self.description = description
         self.chpassword = False
         self.emall_confirm = False
-        self.score = 0
+        self.score_all = 0
+        self.score_times = 0
 
     def toDict(self):
         return {
@@ -267,7 +272,7 @@ class User(db.Model):
             'title': self.title,
             'description': self.description,
             'appointment_num': len(self.appointments_men),
-            'score': self.score,
+            'score': (self.score_all / self.score_times)if self.score_times>0 else u'暂无数据',
         }
 
     def update(self):
