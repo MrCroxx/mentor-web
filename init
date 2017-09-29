@@ -1,0 +1,6 @@
+#!/bin/bash
+mkdir ./app/static/tmp
+mkdir ./app/static/tmp/code
+./manage db init
+./manage db migrate
+./manage db upgrade
