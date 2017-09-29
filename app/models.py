@@ -247,7 +247,8 @@ class Course(db.Model):
 
 class User(db.Model):
     __tablename__ = 'User'
-    id = db.Column(db.Integer, primary_key=True)  # 学号或工号
+    id_key = id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String, unique=True, index=True)  # 学号或工号
     name = db.Column(db.String, index=True)  # 姓名
     salt = db.Column(db.String(8))  # 密码的盐值 防撞库
     passwordhash = db.Column(db.String(64))  # 哈希后的密码
