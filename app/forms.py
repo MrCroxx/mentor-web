@@ -120,10 +120,6 @@ class AppointmentReplyForm(FlaskForm):
     )
 
 
-# old
-
-
-
 class CourseNewForm(FlaskForm):
     name = StringField(
         'name',
@@ -131,71 +127,35 @@ class CourseNewForm(FlaskForm):
             DataRequired(message=u'请输入1-20字符的课程名!'),
             Length(1, 20, message=u'课程名需要1-20字符!')]
     )
-    department = IntegerField(
-        'department',
-        validators=[
-            DataRequired(message=u'请选择开课院系!'),
-        ]
-    )
     capacity = IntegerField(
         'capacity',
         validators=[
-            DataRequired(message=u'请输入课程容量!')
+            DataRequired(message=u'请输入大于0的课程容量!')
         ]
     )
     description = StringField(
         'description',
     )
-    location = StringField(
-        'location',
-    )
-    time_start = StringField(
-        'time_start',
+    time_date_string = StringField(
+        'time_date_string',
         validators=[
-            DataRequired(message=u'请选择课程开始时间!'),
-            Regexp(r'(\d+)-(\d+)-(\d+) (\d+):(\d+)', message=u'请选择正确的日期与时间!')
+            DataRequired(message=u'请选择课程日期!'),
+            Regexp(r'(\d+)-(\d+)-(\d+)', message=u'请选择正确的日期')
         ]
     )
-    time_end = StringField(
-        'time_end',
-        validators=[
-            DataRequired(message=u'请选择课程结束时间!'),
-            Regexp(r'(\d+)-(\d+)-(\d+) (\d+):(\d+)', message=u'请选择正确的日期与时间!')
-        ]
+    time_start_h = IntegerField(
+        'time_start_h',
+        validators=[]
     )
-    time_deadline = StringField(
-        'time_deadline',
-        validators=[
-            DataRequired(message=u'请选择选课结束时间!'),
-            Regexp(r'(\d+)-(\d+)-(\d+) (\d+):(\d+)', message=u'请选择正确的日期与时间!')
-        ]
+    time_start_m = IntegerField(
+        'time_start_m',
+        validators=[]
     )
-
-
-class AppointmentReplyPassForm(FlaskForm):
-    replytext = StringField(
-        'replytext',
+    time_end_h = IntegerField(
+        'time_end_h',
+        validators=[]
     )
-    location = StringField(
-        'location',
-    )
-    time_start = StringField(
-        'time_start',
-        validators=[
-            DataRequired(message=u'请选择预约开始时间!'),
-            Regexp(r'(\d+)-(\d+)-(\d+) (\d+):(\d+)', message=u'请选择正确的日期与时间!')
-        ]
-    )
-    time_end = StringField(
-        'time_end',
-        validators=[
-            DataRequired(message=u'请选择预约结束时间!'),
-            Regexp(r'(\d+)-(\d+)-(\d+) (\d+):(\d+)', message=u'请选择正确的日期与时间!')
-        ]
-    )
-
-
-class AppointmentReplyDenyForm(FlaskForm):
-    replytext = StringField(
-        'replytext',
+    time_end_m = IntegerField(
+        'time_end_m',
+        validators=[]
     )

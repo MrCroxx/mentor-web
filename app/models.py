@@ -173,7 +173,6 @@ class Course(db.Model):
     __tablename__ = 'Course'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 团体课id 自增主键
     name = db.Column(db.String, index=True)  # 团体课名称
-    department = db.Column(db.Integer)  # 学院id
     men_id = db.Column(db.Integer, db.ForeignKey('User.id'))  # 外键 导师id
     stus = db.relationship('User', secondary=relation_course_student, backref=db.backref(
         'courses_stu', lazy='dynamic'), lazy='dynamic')
@@ -182,18 +181,16 @@ class Course(db.Model):
     capacity = db.Column(db.Integer)  # 课程容量
     time_start = db.Column(db.DateTime)  # 课程开始时间
     time_end = db.Column(db.DateTime)  # 课程结束时间
-    time_deadline = db.Column(db.DateTime)  # 选课截至时间
+    time_submit = db.Column(db.DateTime)
 
-    def __init__(self, name, department, men, capacity, description, location, time_start, time_end, time_deadline):
+    def __init__(self, name, men, capacity, description, time_start, time_end):
         self.name = name
-        self.department = department
         self.men = men
         self.capacity = capacity
         self.description = description
-        self.location = location
         self.time_start = time_start
         self.time_end = time_end
-        self.time_deadline = time_deadline
+        self.time_submit = datetime.now()
 
     def __lt__(self, other):
         return self.time_start < other.time_start
@@ -220,6 +217,18 @@ class Course(db.Model):
 
     def full(self):
         return self.stus.count() >= self.capacity
+
+    def toDict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'location': self.location if self.location else u'暂无数据',
+            'capacity': self.capacity,
+            'time_start': self.time_start.strftime('%Y-%m-%d %H:%M:%S'),
+            'time_end': self.time_end.strftime('%Y-%m-%d %H:%M:%S'),
+            'time_sumbit': self.time_submit.strftime('%Y-%m-%d %H:%M:%S'),
+        }
 
 
 class User(db.Model):
@@ -272,7 +281,7 @@ class User(db.Model):
             'title': self.title,
             'description': self.description,
             'appointment_num': len(self.appointments_men),
-            'score': (self.score_all / self.score_times)if self.score_times>0 else u'暂无数据',
+            'score': (self.score_all / self.score_times) if self.score_times > 0 else u'暂无数据',
         }
 
     def update(self):
