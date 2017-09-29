@@ -139,9 +139,6 @@ class Appointment(db.Model):
             'score': self.score,
         }
 
-    def __lt__(self, other):
-        return self.time_submit < other.time_submit
-
     def update(self):
         db.session.add(self)
         db.session.commit()
@@ -192,9 +189,6 @@ class Course(db.Model):
         self.time_end = time_end
         self.time_submit = datetime.now()
 
-    def __lt__(self, other):
-        return self.time_start < other.time_start
-
     def update(self):
         db.session.add(self)
         db.session.commit()
@@ -218,16 +212,36 @@ class Course(db.Model):
     def full(self):
         return self.stus.count() >= self.capacity
 
-    def toDict(self):
+    def isSigned(self, user):
+        return user in self.stus.all()
+
+    def sign(self, user):
+        if not self.isSigned(user):
+            self.stus.append(user)
+            self.update()
+            return True
+        return False
+
+    def unsign(self, user):
+        if self.isSigned(user):
+            self.stus.remove(user)
+            self.update()
+            return True
+        return False
+
+    def toDict(self, user=None):
         return {
             'id': self.id,
             'name': self.name,
+            'men_name': self.men.name,
             'description': self.description,
             'location': self.location if self.location else u'暂无数据',
             'capacity': self.capacity,
+            'signednum': self.getSignedNum(),
             'time_start': self.time_start.strftime('%Y-%m-%d %H:%M:%S'),
             'time_end': self.time_end.strftime('%Y-%m-%d %H:%M:%S'),
             'time_sumbit': self.time_submit.strftime('%Y-%m-%d %H:%M:%S'),
+            'status': 0 if user is None else (1 if self.isSigned(user) else 0),
         }
 
 

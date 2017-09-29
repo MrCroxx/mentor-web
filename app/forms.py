@@ -159,3 +159,22 @@ class CourseNewForm(FlaskForm):
         'time_end_m',
         validators=[]
     )
+
+
+class CourseQueryByDepartmentForm(FlaskForm):
+    department = IntegerField(
+        'department',
+        validators=[
+            DataRequired()
+        ]
+    )
+
+
+class CourseQueryByDateForm(FlaskForm):
+    time_date_string = StringField(
+        'time_date_string',
+        validators=[
+            DataRequired(),
+            Regexp(r'(\d+)-(\d+)-(\d+)')
+        ]
+    )

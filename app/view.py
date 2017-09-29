@@ -225,9 +225,13 @@ def course_new():
         time_start = datetime(y, m, d, time_start_h, time_start_m)
         time_end = datetime(y, m, d, time_end_h, time_end_m)
 
-        course = Course(name, user, capacity, description, time_start, time_end)
-        course.update()
-        flash(u'S创建成功!')
+        if time_start <= time_end:
+            course = Course(name, user, capacity, description, time_start, time_end)
+            course.update()
+            flash(u'S创建成功!')
+            return redirect(url_for('index'))
+        else:
+            flash(u'D创建失败!无效的时间段!')
 
     return render_template('course_new.html', form=form)
 
@@ -239,6 +243,48 @@ def course():
         abort(403)
     courses = Course.query.filter(Course.time_start > datetime.now()).order_by(Course.time_start).all()
     return render_template('course.html', courses=courses)
+
+
+@app.route('/course/<cid>/sign', methods=['GET'])
+@login_required
+def course_sign(cid):
+    user = current_user
+    cid = int(cid)
+    if user.identify == User.IDENTIFY_MENTOR:
+        abort(403)
+    course = Course.query.filter(Course.id == cid).first()
+    if course is None:
+        abort(404)
+    if course.full():
+        flash(u'D课程已满!')
+        return redirect(url_for('course'))
+    user = User.query.filter(User.id == user.id).first()
+    if course.sign(user):
+        flash(u'S选课成功!')
+    else:
+        flash(u'W您已选过该课程!')
+    return redirect(url_for('course'))
+
+
+@app.route('/course/<cid>/unsign', methods=['GET'])
+@login_required
+def course_unsign(cid):
+    user = current_user
+    cid = int(cid)
+    if user.identify == User.IDENTIFY_MENTOR:
+        abort(403)
+    course = Course.query.filter(Course.id == cid).first()
+    if course is None:
+        abort(404)
+    if course.full():
+        flash(u'D课程已满!')
+        return redirect(url_for('course'))
+    user = User.query.filter(User.id == user.id).first()
+    if course.unsign(user):
+        flash(u'S退选成功!')
+    else:
+        flash(u'W您还未选过该课程!')
+    return redirect(url_for('course'))
 
 
 # ajax routes
@@ -343,3 +389,41 @@ def ajax_appointment_score(aid):
             return jsonify({'status': BAD})
     else:
         return jsonify({'status': BAD})
+
+
+@app.route('/ajax/course/query/<type>', methods=['POST'])
+@login_required
+def ajax_course_query(type):
+    user = current_user
+    type = int(type)
+    courses = []
+    if user.identify == User.IDENTIFY_MENTOR:
+        abort(403)
+    if type == 0:
+        courses = Course.query.filter(datetime.now() < Course.time_start).order_by(Course.time_start).all()
+    elif type == 1:
+        form = CourseQueryByDepartmentForm()
+        if form.validate_on_submit():
+            department = form.department.data
+            courses = Course.query.join(User.courses_men).filter(User.department == department).order_by(
+                Course.time_start).all()
+        else:
+            return jsonify({'status': BAD})
+    elif type == 2:
+        form = CourseQueryByDateForm()
+        if form.validate_on_submit():
+            time_date_string = form.time_date_string.data
+            match = re.search(r'(\d+)-(\d+)-(\d+)', time_date_string)
+            y, m, d = int(match.group(1)), int(match.group(2)), int(match.group(3))
+            datetime_query_min = datetime(y, m, d)
+            datetime_query_max = datetime_query_min + timedelta(days=1)
+            courses = Course.query.filter(Course.time_start > datetime_query_min).filter(
+                Course.time_start < datetime_query_max).order_by(Course.time_start).all()
+        else:
+            return jsonify({'status': BAD})
+    elif type == 3:
+        user = User.query.filter(User.id == user.id).first()
+        courses = user.courses_stu.order_by(desc(Course.time_start)).all()
+    user = User.query.filter(User.id == user.id).first()
+    courses_dict = [course.toDict(user) for course in courses]
+    return jsonify({'status': SUCCESS, 'content': courses_dict})
