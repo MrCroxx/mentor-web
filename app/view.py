@@ -27,7 +27,7 @@ def is_safe_url(target):
 
 @lm.user_loader
 def load_user(user_id):
-    return User.query.filter(User.id==user_id).first()
+    return User.query.filter(User.id == user_id).first()
 
 
 @app.before_request
@@ -122,7 +122,7 @@ def appointment_new(men_id):
         y, m, d = int(match.group(1)), int(match.group(2)), int(match.group(3))
         time_date = date(y, m, d)
 
-        if men_id is not None:
+        if men is not None:
             if time_date >= datetime.now().date():
                 appointment = Appointment(user, men, description, time_date)
                 appointment.update()
