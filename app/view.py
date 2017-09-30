@@ -126,7 +126,7 @@ def appointment_new(men_id):
             if time_date >= datetime.now().date():
                 appointment = Appointment(user, men, description, time_date)
                 appointment.update()
-                print 'success!'
+                print 'view',appointment.men
                 flash(u'S预约成功!')
                 return redirect(url_for('appointment_stu'))
             else:

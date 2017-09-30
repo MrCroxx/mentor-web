@@ -89,7 +89,7 @@ department_to_string = {
 relation_course_student = db.Table('relation_course_student',
                                    db.Column('course_id', db.Integer,
                                              db.ForeignKey('Course.id')),
-                                   db.Column('stu_id', db.Integer,
+                                   db.Column('stu_id', db.String,
                                              db.ForeignKey('User.id'))
                                    )
 
@@ -97,8 +97,8 @@ relation_course_student = db.Table('relation_course_student',
 class Appointment(db.Model):
     __tablename__ = 'Appointment'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 预约id 自增主键
-    stu_id = db.Column(db.Integer, db.ForeignKey('User.id'))  # 外键 学生id
-    men_id = db.Column(db.Integer, db.ForeignKey('User.id'))  # 外键 导师id
+    stu_id = db.Column(db.String, db.ForeignKey('User.id'))  # 外键 学生id
+    men_id = db.Column(db.String, db.ForeignKey('User.id'))  # 外键 导师id
     status = db.Column(db.Integer)  # 申请状态
     description = db.Column(db.String)  # 申请理由
     time_date = db.Column(db.Date)  # 预约时间
@@ -121,8 +121,10 @@ class Appointment(db.Model):
         self.time_submit = datetime.now()
         self.time_date = time_date
         self.score = 0
+        print self.men,self.men.id
 
     def toDict(self):
+        print self.men
         return {
             'id': self.id,
             'status': self.status,
@@ -170,7 +172,7 @@ class Course(db.Model):
     __tablename__ = 'Course'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 团体课id 自增主键
     name = db.Column(db.String, index=True)  # 团体课名称
-    men_id = db.Column(db.Integer, db.ForeignKey('User.id'))  # 外键 导师id
+    men_id = db.Column(db.String, db.ForeignKey('User.id'))  # 外键 导师id
     stus = db.relationship('User', secondary=relation_course_student, backref=db.backref(
         'courses_stu', lazy='dynamic'), lazy='dynamic')
     description = db.Column(db.String)  # 课程描述
