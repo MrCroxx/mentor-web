@@ -1,9 +1,9 @@
 # -*- coding:utf-8 -*-
 from random import Random
-import hashlib
-import time
+import hashlib, time, re
 from datetime import datetime, timedelta, date
 from app import db
+from app.dictionary import *
 
 
 def random_str(randomlength=8):
@@ -43,48 +43,6 @@ def getMD5(content):
     return MD5.hexdigest()
 
 
-# 常量
-department_to_string = {
-    1: u'材料科学与工程学院',
-    2: u'电子信息工程学院',
-    3: u'自动化科学与电气工程学院',
-    4: u'能源与动力工程学院',
-    5: u'航空科学与工程学院',
-    6: u'计算机学院',
-    7: u'机械工程及自动化学院',
-    8: u'经济管理学院',
-    9: u'数学与系统科学学院',
-    10: u'生物与医学工程学院',
-    11: u'人文社会科学学院',
-    12: u'外国语学院',
-    13: u'交通科学与工程学院',
-    14: u'可靠性与系统工程学院',
-    15: u'宇航学院',
-    16: u'飞行学院',
-    17: u'仪器科学与光电工程学院',
-    18: u'北京学院',
-    19: u'物理科学与核能工程学院',
-    20: u'法学院',
-    21: u'软件学院',
-    22: u'现代远程教育学院',
-    23: u'高等理工学院',
-    24: u'中法工程师学院',
-    25: u'国际学院',
-    26: u'新媒体艺术与设计学院',
-    27: u'化学与环境学院',
-    28: u'马克思主义学院',
-    29: u'人文与社会科学高等研究院',
-    30: u'空间与环境学院',
-    35: u'国际通用工程学院',
-    37: u'北航学院',
-    73: u'士谔书院',
-    74: u'冯如书院',
-    75: u'士嘉书院',
-    76: u'守锷书院',
-    77: u'致真书院',
-    79: u'知行书院',
-}
-
 # 多对多关系表
 relation_course_student = db.Table('relation_course_student',
                                    db.Column('course_id', db.Integer,
@@ -121,7 +79,7 @@ class Appointment(db.Model):
         self.time_submit = datetime.now()
         self.time_date = time_date
         self.score = 0
-        print self.men,self.men.id
+        print self.men, self.men.id
 
     def toDict(self):
         print self.men
@@ -209,7 +167,7 @@ class Course(db.Model):
         return self.stus.count()
 
     def getDepartmentString(self):
-        return department_to_string[self.department]
+        return department_id2name[self.department]
 
     def full(self):
         return self.stus.count() >= self.capacity
@@ -258,9 +216,11 @@ class User(db.Model):
     emall = db.Column(db.String)  # 邮箱地址
     emall_confirm = db.Column(db.Boolean)  # 邮箱是否认证
     identify = db.Column(db.Integer)  # 身份(学生/教师)
-    department = db.Column(db.Integer)  # 部门ID
+    department = db.Column(db.String)  # 部门ID
     title = db.Column(db.String)  # 职称(教师)
     description = db.Column(db.String)  # 简介(教师)
+    tag1 = db.Column(db.String)
+    tag2 = db.Column(db.String)
     score_all = db.Column(db.Float)  # 评分(总)
     score_times = db.Column(db.Integer)  # 评分次数
 
@@ -277,12 +237,14 @@ class User(db.Model):
     IDENTIFY_MENTOR = 1
     IDENTIFY_STUDENT = 0
 
-    def __init__(self, id, password, name, identiry, department, title, description):
+    def __init__(self, id, password, name, identiry, department, tag1, tag2, title, description):
         self.id = id
         self.setPasswordhash(password, update=False)
         self.name = name
         self.identify = identiry
         self.department = department
+        self.tag1 = tag1
+        self.tag2 = tag2
         self.title = title
         self.description = description
         self.chpassword = False
@@ -294,7 +256,7 @@ class User(db.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'department': department_to_string[self.department],
+            'department': department_id2name[self.department],
             'title': self.title,
             'description': self.description,
             'appointment_num': len(self.appointments_men),
@@ -323,7 +285,15 @@ class User(db.Model):
         self.update()
 
     def getDepartmentString(self):
-        return department_to_string[self.department]
+        return department_id2name[self.department]
+
+    def getTagString(self):
+        tags = re.findall(ur'(?<=#)[^#]+?(?=#)', self.tag2)
+        s = ''
+        for t2 in tags:
+            t1 = tag2totag1[t2]
+            s += '[%s]%s,' % (tag1toname[t1], tag2toname[t2])
+        return s
 
     def isMen(self):
         return True if self.identify == User.IDENTIFY_MENTOR else False

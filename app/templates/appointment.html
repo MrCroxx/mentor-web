@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from 'macros.html' import department_options %}
+{% from 'macros.html' import department_options,tag1_options,tag2_options %}
 
 {% block head %}
     <title>导师有约 —— 导师预约</title>
@@ -23,11 +23,71 @@
                                 <div class="panel-title">导师检索</div>
                             </div>
                             <div class="panel-body">
+
+
                                 <div class="row">
+                                    <div class="col-md-12">
+                                        <h4>检索方式</h4>
+                                        <select id="type" name="type" class="form-control">
+                                            <option value="0" selected="selected">全部导师</option>
+                                            <option value="1">按学院检索</option>
+                                            <option value="2">按大类检索</option>
+                                            <option value="3">按小类检索</option>
+                                        </select>
+                                        <script language="javascript">
+                                            $(document).ready(function () {
+                                                $('#type_department').hide();
+                                                $('#type_tag1').hide();
+                                                $('#type_tag2').hide();
+                                                $("#type").change(function () {
+                                                    switch ($("#type").val()) {
+                                                        case "0":
+                                                            $('#type_department').hide();
+                                                            $('#type_tag1').hide();
+                                                            $('#type_tag2').hide();
+                                                            break;
+                                                        case "1":
+                                                            $('#type_department').show();
+                                                            $('#type_tag1').hide();
+                                                            $('#type_tag2').hide();
+                                                            break;
+                                                        case "2":
+                                                            $('#type_department').hide();
+                                                            $('#type_tag1').show();
+                                                            $('#type_tag2').hide();
+                                                            break;
+                                                        case "3":
+                                                            $('#type_department').hide();
+                                                            $('#type_tag1').hide();
+                                                            $('#type_tag2').show();
+                                                            break;
+                                                    }
+                                                });
+                                            });
+                                        </script>
+                                    </div>
+                                </div>
+                                <div class="row" id="type_department">
                                     <div class="col-md-12">
                                         <h4>学院</h4>
                                         <select id="department" name="department" class="form-control">
                                             {{ department_options() }}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row" id="type_tag1">
+                                    <div class="col-md-12">
+                                        <h4>大类标签</h4>
+                                        <select id="tag1" name="tag1" class="form-control">
+                                            {{ tag1_options() }}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row" id="type_tag2">
+                                    <div class="col-md-12">
+                                        <h4>细分标签</h4>
+                                        <select id="tag2" name="tag2" class="form-control">
+                                            {{ tag2_options() }}
                                         </select>
                                     </div>
                                 </div>
@@ -44,8 +104,11 @@
                                             function ajax_query() {
                                                 $.ajax({
                                                     type: "POST",
-                                                    url: "/ajax/mentor/query",
-                                                    data: "department=" + $('#department').val(),
+                                                    url: "/ajax/mentor/query/" + $('#type').val(),
+                                                    data: "department=" + $('#department').val()
+                                                    + "&" + "tag1=" + $('#tag1').val()
+                                                    + "&" + "tag2=" + $('#tag2').val()
+                                                    ,
                                                     dataType: 'json',
                                                     async: false,
                                                     beforeSend: function (xhr, settings) {
@@ -62,7 +125,7 @@
                                                                 mentor = mentors[i];
                                                                 button = "<a href=\"/appointment/new/" + mentor.id + "\" class=\"btn btn-primary btn-sm\">预约</a>"
                                                                 var row = "<tr>"
-                                                                    + "<td>" + mentor.name + "</td>"
+                                                                    + "<td>" + "<a href=\"/user/" + mentor.id + "\">" + mentor.name + "</a>" + "</td>"
                                                                     + "<td>" + mentor.department + "(" + mentor.title + ")" + "</td>"
                                                                     + "<td>" + mentor.appointment_num + "</td>"
                                                                     + "<td>" + mentor.score + "%" + "</td>"
@@ -78,6 +141,7 @@
                                             }
                                         </script>
                                     </div>
+
                                 </div>
                             </div>
                         </div>

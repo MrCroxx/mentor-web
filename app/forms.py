@@ -56,9 +56,23 @@ class SetPasswordForm(FlaskForm):
     )
 
 
-class MentorQueryForm(FlaskForm):
-    department = IntegerField(
+class MentorQueryByDepartmentForm(FlaskForm):
+    department = StringField(
         'department',
+        validators=[
+            DataRequired()
+        ]
+    )
+
+
+class MentorQueryByTagForm(FlaskForm):
+    tag1 = StringField(
+        'tag1',
+        validators=[
+        ]
+    )
+    tag2 = StringField(
+        'tag2',
         validators=[
         ]
     )
@@ -78,7 +92,7 @@ class AppointmentNewForm(FlaskForm):
 
 
 class AppointmentQueryByDepartmentForm(FlaskForm):
-    department = IntegerField(
+    department = StringField(
         'department',
         validators=[
             DataRequired()
@@ -162,7 +176,7 @@ class CourseNewForm(FlaskForm):
 
 
 class CourseQueryByDepartmentForm(FlaskForm):
-    department = IntegerField(
+    department = StringField(
         'department',
         validators=[
             DataRequired()
