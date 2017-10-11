@@ -35,11 +35,8 @@
                                             <option value="3">按小类检索</option>
                                         </select>
                                         <script language="javascript">
-                                            $(document).ready(function () {
-                                                $('#type_department').hide();
-                                                $('#type_tag1').hide();
-                                                $('#type_tag2').hide();
-                                                $("#type").change(function () {
+
+                                            function change() {
                                                     switch ($("#type").val()) {
                                                         case "0":
                                                             $('#type_department').hide();
@@ -62,7 +59,16 @@
                                                             $('#type_tag2').show();
                                                             break;
                                                     }
+                                                }
+
+                                            $(document).ready(function () {
+
+                                                change();
+
+                                                $("#type").change(function () {
+                                                    change();
                                                 });
+
                                             });
                                         </script>
                                     </div>
