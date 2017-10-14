@@ -306,8 +306,46 @@ def user_info(uid):
         abort(404)
 
 
-# ajax routes
+@app.route('/appointment/<aid>/review/new', methods=['GET', 'POST'])
+@login_required
+def review_new(aid):
+    user = current_user
+    appointment = Appointment.query.filter(Appointment.id == aid).first()
+    if user.identify == User.IDENTIFY_STUDENT:
+        abort(403)
+    if appointment is None:
+        abort(404)
+    if appointment.men.id != user.id:
+        abort(403)
+    form = ReviewNewForm()
+    if form.validate_on_submit():
+        type = form.type.data
+        location = form.location.data
+        message_stu = form.message_stu.data
+        message_men = form.message_men.data
+        message_slu = form.message_slu.data
+        rev = Review(appointment, location, type, message_stu, message_men, message_slu)
+        rev.update()
+        return redirect(url_for('review', aid=appointment.id))
+    return render_template('review_new.html', appointment=appointment, form=form)
 
+
+@app.route('/appointment/<aid>/review')
+@login_required
+def review(aid):
+    user = current_user
+    appointment = Appointment.query.filter(Appointment.id == aid).first()
+    if user.identify == User.IDENTIFY_STUDENT:
+        abort(403)
+    if appointment is None:
+        abort(404)
+    if appointment.men.id != user.id:
+        abort(403)
+    review = appointment.review
+    return render_template('review.html', appointment=appointment, review=review)
+
+
+# ajax routes
 @app.route('/ajax/getIdentifyingcode', methods=['POST'])
 def getIdentifyingcode():
     code_img, code_text = drawIdentifyingCode()

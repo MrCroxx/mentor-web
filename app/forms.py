@@ -210,3 +210,37 @@ class CourseQueryByDateForm(FlaskForm):
             Regexp(r'(\d+)-(\d+)-(\d+)')
         ]
     )
+
+
+class ReviewNewForm(FlaskForm):
+    location = StringField(
+        'location',
+        validators=[
+            DataRequired(message=u'请填写辅导地点!')
+        ]
+    )
+    type = IntegerField(
+        'type',
+        validators=[
+        ]
+    )
+    message_stu = StringField(
+        'message_stu',
+        validators=[
+            DataRequired(message=u'请填写学生问题自述!')
+        ]
+    )
+
+    message_men = StringField(
+        'message_men',
+        validators=[
+            DataRequired(message=u'请填写导师诊断!')
+        ]
+    )
+
+    message_slu = StringField(
+        'message_slu',
+        validators=[
+            DataRequired(message=u'请填写解决方案!')
+        ]
+    )

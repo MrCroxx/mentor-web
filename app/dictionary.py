@@ -323,3 +323,10 @@ tag2toname = {
     'EXYGH00': u'学业规划',
     'EZYSY00': u'职业生涯',
 }
+
+review_type_id2string = {
+    0: u'其他类',
+    1: u'学业类',
+    2: u'心理类',
+    3: u'成长类',
+}

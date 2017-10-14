@@ -72,13 +72,16 @@ class Review(db.Model):
         self.appointment = appointment
         self.location = location
         self.type = type
-        self.m_stu = m_stu
-        self.m_men = m_men
-        self.m_slu = m_slu
+        self.message_stu = m_stu
+        self.message_men = m_men
+        self.message_slu = m_slu
 
     def update(self):
         db.session.add(self)
         db.session.commit()
+
+    def getTypeString(self):
+        return review_type_id2string[self.type]
 
 
 class Appointment(db.Model):
@@ -160,6 +163,9 @@ class Appointment(db.Model):
         self.men.score_times += 1
         self.men.update()
         self.update()
+
+    def hasReview(self):
+        return self.review is not None
 
 
 class Course(db.Model):

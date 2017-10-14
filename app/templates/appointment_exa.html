@@ -48,7 +48,7 @@
                                     <div class="panel-body">
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <h4>预约时间 : {{ appointment.time_date.strftime("%Y-%m-%d") }}</h4>
+                                                <h4>预约时间 : {{ appointment.time_time.strftime("%Y-%m-%d %H:%M") }}</h4>
                                                 <h4>预约原因 : </h4>
                                                 <p>{{ appointment.description }}</p>
                                             </div>
@@ -141,19 +141,20 @@
                                                     </div>
                                                 {% endif %}
                                                 {% if appointment.status == 1 %}
-                                                    {% if appointment.review is None %}
+                                                    {% if not appointment.hasReview() %}
                                                         <div class="row">
                                                             <div class="col-md-12">
-                                                                <div class="btn btn-success" style="width: 100%">提交总结
-                                                                </div>
+                                                                <a href="/appointment/{{ appointment.id }}/review/new"
+                                                                   class="btn btn-success" style="width: 100%">提交总结
+                                                                </a>
                                                             </div>
                                                         </div>
                                                     {% else %}
                                                         <div class="row">
                                                             <div class="col-md-12">
-                                                                <p><font style="color: green">
-                                                                    总结已提交!
-                                                                </font></p>
+                                                                <a href="/appointment/{{ appointment.id }}/review"
+                                                                   class="btn btn-success" style="width: 100%">查看总结
+                                                                </a>
                                                             </div>
                                                         </div>
                                                     {% endif %}

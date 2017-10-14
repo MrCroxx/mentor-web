@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>导师有约 —— 查看总结</title>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="thumbnail">
+                    <div class="caption">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h3>学生{{ appointment.stu.name }}的预约总结</h3>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel-primary">
+                                    <div class="panel-heading">
+                                        <div class="panel-title">个人信息</div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <p>学号 : {{ appointment.stu.id }}</p>
+                                                <p>姓名 : {{ appointment.stu.name }}</p>
+                                                <p>学院 : {{ appointment.stu.getDepartmentString() }}</p>
+                                                <p>手机 : {{ appointment.phone }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel-primary">
+                                    <div class="panel-heading">
+                                        <div class="panel-title">预约信息</div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h4>预约时间 : {{ appointment.time_time.strftime("%Y-%m-%d %H:%M") }}</h4>
+                                                <h4>预约原因 : </h4>
+                                                <p>{{ appointment.description }}</p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel-primary">
+                                    <div class="panel-heading">
+                                        <div class="panel-title">总结信息</div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h4>辅导地点 : {{ review.location }}</h4>
+                                                <h4>辅导类型 : {{ review.getTypeString() }}</h4>
+                                                <h4>学生自述 : </h4>
+                                                <p>{{ review.message_stu }}</p>
+                                                <h4>导师诊断 : </h4>
+                                                <p>{{ review.message_men }}</p>
+                                                <h4>解决方案 : </h4>
+                                                <p>{{ review.message_slu }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
