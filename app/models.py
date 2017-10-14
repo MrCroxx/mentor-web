@@ -96,7 +96,7 @@ class Appointment(db.Model):
             'description': self.description if self.description else u'暂无数据',
             'replytext': self.replytext if self.replytext else u'暂无数据',
             'location': self.location if self.location else u'暂无数据',
-            'time_date': self.time_date.strftime("%Y-%m-%d %H:%M") if self.time_date else u'暂无数据',
+            'time_date': self.time_time.strftime("%Y-%m-%d %H:%M") if self.time_date else u'暂无数据',
             'score': self.score,
         }
 
