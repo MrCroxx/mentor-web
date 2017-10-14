@@ -121,10 +121,14 @@ def appointment_new(men_id):
         match = re.search(r'(\d+)-(\d+)-(\d+)', time_date_string)
         y, m, d = int(match.group(1)), int(match.group(2)), int(match.group(3))
         time_date = date(y, m, d)
+        time_h = int(form.time_hour.data)
+        time_m = int(form.time_minute.data)
+        time_time = datetime(y, m, d, time_h, time_m)
 
         if men is not None:
-            if time_date >= datetime.now().date():
-                appointment = Appointment(user, men, description, time_date)
+            if time_date >= datetime.now().date() + timedelta(
+                    days=7) and time_date <= datetime.now().date() + timedelta(days=14):
+                appointment = Appointment(user, men, description, time_date, time_time)
                 appointment.update()
                 print 'view', appointment.men
                 flash(u'S预约成功!')

@@ -59,7 +59,8 @@ class Appointment(db.Model):
     men_id = db.Column(db.String, db.ForeignKey('User.id'))  # 外键 导师id
     status = db.Column(db.Integer)  # 申请状态
     description = db.Column(db.String)  # 申请理由
-    time_date = db.Column(db.Date)  # 预约时间
+    time_date = db.Column(db.Date)  # 预约日期
+    time_time = db.Column(db.DateTime)  # 预约日期+时间
     replytext = db.Column(db.String)  # 审批理由
     location = db.Column(db.String)  # 预约教室
     time_submit = db.Column(db.DateTime)  # 申请时间
@@ -71,7 +72,7 @@ class Appointment(db.Model):
     STATUS_PASS = 1
     STATUS_DENY = 2
 
-    def __init__(self, stu, men, description, time_date):
+    def __init__(self, stu, men, description, time_date, time_time):
         self.stu = stu
         self.men = men
         self.description = description
@@ -79,7 +80,7 @@ class Appointment(db.Model):
         self.time_submit = datetime.now()
         self.time_date = time_date
         self.score = 0
-        print self.men, self.men.id
+        self.time_time = time_time
 
     def toDict(self):
         print self.men
@@ -95,7 +96,7 @@ class Appointment(db.Model):
             'description': self.description if self.description else u'暂无数据',
             'replytext': self.replytext if self.replytext else u'暂无数据',
             'location': self.location if self.location else u'暂无数据',
-            'time_date': self.time_date.strftime("%Y-%m-%d") if self.time_date else u'暂无数据',
+            'time_date': self.time_date.strftime("%Y-%m-%d %H:%M") if self.time_date else u'暂无数据',
             'score': self.score,
         }
 

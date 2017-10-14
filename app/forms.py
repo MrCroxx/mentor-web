@@ -89,6 +89,18 @@ class AppointmentNewForm(FlaskForm):
             Regexp(r'(\d+)-(\d+)-(\d+)', message=u'请选择正确的日期!')
         ]
     )
+    time_hour = IntegerField(
+        'time_hour',
+        validators=[
+            NumberRange(0, 24, message=u'请选择正确的时间!')
+        ]
+    )
+    time_minute = IntegerField(
+        'time_minute',
+        validators=[
+            NumberRange(0, 60, message=u'请选择正确的时间!')
+        ]
+    )
 
 
 class AppointmentQueryByDepartmentForm(FlaskForm):

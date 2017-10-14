@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros.html" import hour_options,minute_options %}
 
 {% block head %}
     <title>导师有约 —— 创建预约</title>
@@ -19,6 +20,9 @@
                             <fieldset>
                                 <legend>创建预约</legend>
                                 {{ form.hidden_tag() }}
+
+                                <p><font style="color: red">*请同学们仔细查看导师个人简介，选择导师的可选辅导时间进行预约。</font></p>
+
                                 <div class="form-group">
                                     <label for="date" class="col-md-3 control-label">预约日期</label>
                                     <div class="col-md-6">
@@ -26,10 +30,15 @@
                                                class="form-control"><br/>
 
                                         <script type="text/javascript">
+                                            var date_start = new Date();
+                                            var date_end = new Date();
+                                            date_start.setDate(date_start.getDate() + 7);
+                                            date_end.setDate(date_end.getDate() + 14);
                                             $("#time_date_string").datepicker({
                                                 autoHide: true,
                                                 format: "yyyy-mm-dd",
-                                                startDate: new Date(),
+                                                startDate: date_start,
+                                                endDate: date_end,
                                                 language: 'zh-CN'
                                             });
                                         </script>
@@ -37,6 +46,22 @@
                                         {% for e in form.time_date_string.errors %}
                                             <span style='color:red'>*{{ e }}</span><br/>
                                         {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="time_hour" class="col-md-3 control-label">预约时间</label>
+                                    <div class="col-md-3">
+                                        <select id="time_hour" name="time_hour" class="form-control">
+                                            {{ hour_options() }}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <h4>:</h4>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <select id="time_minute" name="time_minute" class="form-control">
+                                            {{ minute_options() }}
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="form-group">
