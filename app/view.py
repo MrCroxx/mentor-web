@@ -420,10 +420,14 @@ def ajax_appointment_score(aid):
     appointment = Appointment.query.filter(Appointment.id == aid).first()
     if appointment is not None:
         if appointment.stu.id == user.id:
-            score = request.form.get('score', 0)
-            score = int(score)
-            appointment.setScore(score)
-            return jsonify({'status': SUCCESS})
+            if appointment.canScore():
+                score = request.form.get('score', 0)
+                score = int(score)
+                comment = request.form.get('comment', "")
+                appointment.setScore(score, comment)
+                return jsonify({'status': SUCCESS})
+            else:
+                return jsonify({'status': BAD})
         else:
             return jsonify({'status': BAD})
     else:

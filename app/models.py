@@ -67,6 +67,7 @@ class Appointment(db.Model):
     time_reply = db.Column(db.DateTime)  # 审批时间
     score = db.Column(db.Float)  # 预约评分
     phone = db.Column(db.String)  # 学生手机号码
+    comment = db.Column(db.String) # 评价
 
     # 常量
     STATUS_WAITING = 0
@@ -122,8 +123,9 @@ class Appointment(db.Model):
         # return (datetime.now().date() > self.time_date) and (self.status == Appointment.STATUS_PASS) and (self.score==0)
         return (self.status == Appointment.STATUS_PASS) and (self.score == 0)
 
-    def setScore(self, score):
+    def setScore(self, score,comment):
         self.score = score
+        self.comment = comment
         self.men.score_all += score
         self.men.score_times += 1
         self.men.update()

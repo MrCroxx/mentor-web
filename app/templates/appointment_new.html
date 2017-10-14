@@ -81,9 +81,9 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="description" class="col-md-3 control-label">手机号码</label>
-                                    {{ form.phone(class='form-control') }}<br/>
+                                    <label for="phone" class="col-md-3 control-label">手机号码</label>
                                     <div class="col-md-6">
+                                    {{ form.phone(class='form-control') }}<br/>
                                         {% for e in form.phone.errors %}
                                             <span style='color:red'>*{{ e }}</span><br/>
                                         {% endfor %}

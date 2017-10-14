@@ -32,6 +32,7 @@
                                                 <p>学号 : {{ appointment.stu.id }}</p>
                                                 <p>姓名 : {{ appointment.stu.name }}</p>
                                                 <p>学院 : {{ appointment.stu.getDepartmentString() }}</p>
+                                                <p>手机 : {{ appointment.phone }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -90,7 +91,7 @@
                                                                 {% if appointment.status==1 %}
                                                                     <span style="color: green">通过</span>
                                                                 {% elif appointment.status==2 %}
-                                                                    <span style="color: red">拒绝</span>
+                                                                    <span style="color: red">未通过</span>
                                                                 {% endif %}
                                                             </h4>
                                                             <h4>导师批注 : </h4>
@@ -109,7 +110,7 @@
                                 <div class="col-md-12">
                                     <div class="panel-primary">
                                         <div class="panel-heading">
-                                            <div class="panel-title">评分</div>
+                                            <div class="panel-title">评价</div>
                                         </div>
                                         <div class="panel-body">
 
@@ -134,8 +135,14 @@
                                             </div>
                                             <div class="row">
                                                 <div class="col-md-12">
+                                                    <h4>评价 ： </h4>
+                                                    <textarea id="comment" rows="3" style="width: 100%"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
                                                     <div onclick="score_submit()" class="btn btn-success"
-                                                         style="width: 100%">提交评分
+                                                         style="width: 100%">提交评价
                                                     </div>
                                                     <script>
                                                         var csrftoken = "{{ csrf_token()|safe }}";
@@ -143,7 +150,8 @@
                                                         function score_submit() {
                                                             $.post({
                                                                 url: "/ajax/appointment/{{ appointment.id|safe }}/score",
-                                                                data: "score=" + $("#score").val(),
+                                                                data: "score=" + $("#score").val()
+                                                                + "&" + "comment=" + $("#comment").val(),
                                                                 async: false,
                                                                 beforeSend: function (xhr, settings) {
                                                                     xhr.setRequestHeader("X-CSRFToken", csrftoken)
@@ -179,6 +187,8 @@
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <h4>评分 : {{ appointment.score }}</h4>
+                                                    <h4>评价 ： </h4>
+                                                    <p>{{ appointment.comment }}</p>
                                                 </div>
                                             </div>
                                         </div>
