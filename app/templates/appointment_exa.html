@@ -79,18 +79,19 @@
                                                                 <label for="replytext"
                                                                        class="col-md-3 control-label">导师批注</label>
                                                                 <div class="col-md-6">
-                                                                <p>
-                                                                    <font style="color: red;">
-                                                                        *1.因时间无法协调或学生问题与辅导内容不一致，请选择“未通过”按钮，并在导师批注中填写相关批注，如填写其他可预约时间或其他建议。
-                                                                    </font>
-                                                                </p>
-                                                                <p>
-                                                                    <font style="color: red;">
-                                                                        *2.如果时间合适，请选择“通过”按钮，并在导师批注中回复建议辅导地点或留下邮箱等联系方式方便沟通辅导地点。
-                                                                    </font>
-                                                                </p>
-                                        <textarea id="replytext" name="replytext" class="form-control"
-                                                  rows="3"></textarea>
+                                                                    <p>
+                                                                        <font style="color: red;">
+                                                                            *1.因时间无法协调或学生问题与辅导内容不一致，请选择“未通过”按钮，并在导师批注中填写相关批注，如填写其他可预约时间或其他建议。
+                                                                        </font>
+                                                                    </p>
+                                                                    <p>
+                                                                        <font style="color: red;">
+                                                                            *2.如果时间合适，请选择“通过”按钮，并在导师批注中回复建议辅导地点或留下邮箱等联系方式方便沟通辅导地点。
+                                                                        </font>
+                                                                    </p>
+                                                                    <textarea id="replytext" name="replytext"
+                                                                              class="form-control"
+                                                                              rows="3"></textarea>
                                                                     {% for e in form.replytext.errors %}
                                                                         <span style='color:red'>*{{ e }}</span><br/>
                                                                     {% endfor %}
@@ -138,6 +139,24 @@
                                                             <p>{{ appointment.replytext }}</p>
                                                         </div>
                                                     </div>
+                                                {% endif %}
+                                                {% if appointment.status == 1 %}
+                                                    {% if appointment.review is None %}
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="btn btn-success" style="width: 100%">提交总结
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {% else %}
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <p><font style="color: green">
+                                                                    总结已提交!
+                                                                </font></p>
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
                                                 {% endif %}
                                             </div>
                                         </div>

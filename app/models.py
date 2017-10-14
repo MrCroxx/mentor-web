@@ -52,6 +52,35 @@ relation_course_student = db.Table('relation_course_student',
                                    )
 
 
+class Review(db.Model):
+    __tablename__ = 'Review'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    appointment_id = db.Column(db.Integer, db.ForeignKey('Appointment.id'))
+    appointment = db.relationship("Appointment", back_populates='review')
+    location = db.Column(db.String)
+    type = db.Column(db.Integer)
+    message_stu = db.Column(db.String)
+    message_men = db.Column(db.String)
+    message_slu = db.Column(db.String)
+
+    TYPE_OTHER = 0
+    TYPE_STUDY = 1
+    TYPE_PHY = 2
+    TYPE_GRUTH = 3
+
+    def __init__(self, appointment, location, type, m_stu, m_men, m_slu):
+        self.appointment = appointment
+        self.location = location
+        self.type = type
+        self.m_stu = m_stu
+        self.m_men = m_men
+        self.m_slu = m_slu
+
+    def update(self):
+        db.session.add(self)
+        db.session.commit()
+
+
 class Appointment(db.Model):
     __tablename__ = 'Appointment'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 预约id 自增主键
@@ -67,7 +96,8 @@ class Appointment(db.Model):
     time_reply = db.Column(db.DateTime)  # 审批时间
     score = db.Column(db.Float)  # 预约评分
     phone = db.Column(db.String)  # 学生手机号码
-    comment = db.Column(db.String) # 评价
+    comment = db.Column(db.String)  # 评价
+    review = db.relationship("Review", uselist=False, back_populates="appointment")  # 总结
 
     # 常量
     STATUS_WAITING = 0
@@ -123,7 +153,7 @@ class Appointment(db.Model):
         # return (datetime.now().date() > self.time_date) and (self.status == Appointment.STATUS_PASS) and (self.score==0)
         return (self.status == Appointment.STATUS_PASS) and (self.score == 0)
 
-    def setScore(self, score,comment):
+    def setScore(self, score, comment):
         self.score = score
         self.comment = comment
         self.men.score_all += score
