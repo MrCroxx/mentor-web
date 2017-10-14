@@ -63,6 +63,12 @@
                                             {{ minute_options() }}
                                         </select>
                                     </div>
+                                    {% for e in form.time_hour.errors %}
+                                        <span style='color:red'>*{{ e }}</span><br/>
+                                    {% endfor %}
+                                    {% for e in form.time_minute.errors %}
+                                        <span style='color:red'>*{{ e }}</span><br/>
+                                    {% endfor %}
                                 </div>
                                 <div class="form-group">
                                     <label for="description" class="col-md-3 control-label">预约原因</label>
@@ -70,6 +76,15 @@
                                         <textarea id="description" name="description" class="form-control"
                                                   rows="3"></textarea>
                                         {% for e in form.description.errors %}
+                                            <span style='color:red'>*{{ e }}</span><br/>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="description" class="col-md-3 control-label">手机号码</label>
+                                    {{ form.phone(class='form-control') }}<br/>
+                                    <div class="col-md-6">
+                                        {% for e in form.phone.errors %}
                                             <span style='color:red'>*{{ e }}</span><br/>
                                         {% endfor %}
                                     </div>

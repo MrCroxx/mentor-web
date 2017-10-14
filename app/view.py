@@ -125,10 +125,12 @@ def appointment_new(men_id):
         time_m = int(form.time_minute.data)
         time_time = datetime(y, m, d, time_h, time_m)
 
+        phone = form.phone.data
+
         if men is not None:
             if time_date >= datetime.now().date() + timedelta(
                     days=7) and time_date <= datetime.now().date() + timedelta(days=14):
-                appointment = Appointment(user, men, description, time_date, time_time)
+                appointment = Appointment(user, men, description, time_date, time_time, phone)
                 appointment.update()
                 print 'view', appointment.men
                 flash(u'S预约成功!')

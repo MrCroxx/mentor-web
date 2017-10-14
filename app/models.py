@@ -66,13 +66,14 @@ class Appointment(db.Model):
     time_submit = db.Column(db.DateTime)  # 申请时间
     time_reply = db.Column(db.DateTime)  # 审批时间
     score = db.Column(db.Float)  # 预约评分
+    phone = db.Column(db.String)  # 学生手机号码
 
     # 常量
     STATUS_WAITING = 0
     STATUS_PASS = 1
     STATUS_DENY = 2
 
-    def __init__(self, stu, men, description, time_date, time_time):
+    def __init__(self, stu, men, description, time_date, time_time, phone):
         self.stu = stu
         self.men = men
         self.description = description
@@ -81,6 +82,7 @@ class Appointment(db.Model):
         self.time_date = time_date
         self.score = 0
         self.time_time = time_time
+        self.phone = phone
 
     def toDict(self):
         print self.men
@@ -98,6 +100,7 @@ class Appointment(db.Model):
             'location': self.location if self.location else u'暂无数据',
             'time_date': self.time_time.strftime("%Y-%m-%d %H:%M") if self.time_date else u'暂无数据',
             'score': self.score,
+            'phone': self.phone,
         }
 
     def update(self):

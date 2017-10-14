@@ -101,6 +101,12 @@ class AppointmentNewForm(FlaskForm):
             NumberRange(0, 60, message=u'请选择正确的时间!')
         ]
     )
+    phone = StringField(
+        'phone',
+        validators=[
+            DataRequired(message=u'请填写手机号码!')
+        ]
+    )
 
 
 class AppointmentQueryByDepartmentForm(FlaskForm):
