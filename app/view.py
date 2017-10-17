@@ -53,7 +53,8 @@ def index():
 @login_required
 def logout_lm():
     logout_user()
-    return redirect(url_for('index'))
+    # return redirect(url_for('index'))
+    return redirect(url_for('logout'))
 
 
 '''
