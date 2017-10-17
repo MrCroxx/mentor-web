@@ -4,7 +4,7 @@ from flask import render_template, url_for, redirect, flash, request, abort, ses
 from app import app, lm
 from sqlalchemy import desc
 from app.forms import *
-# from flask_login import login_user, logout_user, login_required, current_user
+from flask_login import login_user, logout_user, login_required, current_user
 from urlparse import urlparse, urljoin
 from identifyingcode import drawIdentifyingCode
 from PIL import Image
