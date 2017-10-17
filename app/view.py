@@ -41,7 +41,21 @@ def before_request():
 @app.route('/')
 @app.route('/index', methods=['GET'])
 def index():
+    if 'user_id' in session:
+        id = session['user_id']
+        u = User.query.filter(User.id == id).first()
+        if u is not None:
+            login_user(u, True)
+            u.login()
+    print session
     return render_template('index.html')
+
+@app.route('/logout/lm',methods=['GET'])
+@login_required
+def logout_lm():
+    logout_user()
+    return redirect(url_for('index'))
+
 
 '''
 @app.route('/login', methods=['GET', 'POST'])
