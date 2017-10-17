@@ -4,7 +4,7 @@ from flask import render_template, url_for, redirect, flash, request, abort, ses
 from app import app, lm
 from sqlalchemy import desc
 from app.forms import *
-from flask_login import login_user, logout_user, login_required, current_user
+# from flask_login import login_user, logout_user, login_required, current_user
 from urlparse import urlparse, urljoin
 from identifyingcode import drawIdentifyingCode
 from PIL import Image
@@ -43,7 +43,7 @@ def before_request():
 def index():
     return render_template('index.html')
 
-
+'''
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -75,7 +75,7 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('index'))
-
+'''
 
 @app.route('/info/setpassword', methods=['GET', 'POST'])
 @login_required
