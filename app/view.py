@@ -47,7 +47,6 @@ def index():
         if u is not None:
             login_user(u, True)
             u.login()
-    print session
     return render_template('index.html')
 
 @app.route('/logout/lm',methods=['GET'])
