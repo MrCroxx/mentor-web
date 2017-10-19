@@ -57,7 +57,7 @@ def logout_lm():
     return redirect(url_for('cas.logout'))
 
 @app.route('/login/test', methods=['GET', 'POST'])
-def login():
+def login_test():
     form = LoginForm()
     id = form.id.data
     password = form.password.data
