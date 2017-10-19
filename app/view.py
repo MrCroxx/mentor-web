@@ -268,7 +268,7 @@ def course():
 
 @app.route('/course/men', methods=['GET'])
 @login_required
-def course():
+def course_men():
     if current_user.identify == User.IDENTIFY_STUDENT:
         abort(403)
     # courses = Course.query.filter(Course.time_start > datetime.now()).order_by(Course.time_start).all()
