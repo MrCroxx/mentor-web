@@ -49,7 +49,8 @@ def index():
             u.login()
     return render_template('index.html')
 
-@app.route('/logout/lm',methods=['GET'])
+
+@app.route('/logout/lm', methods=['GET'])
 @login_required
 def logout_lm():
     logout_user()
@@ -89,6 +90,7 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 '''
+
 
 @app.route('/info/setpassword', methods=['GET', 'POST'])
 @login_required
@@ -260,8 +262,17 @@ def course_new():
 def course():
     if current_user.identify == User.IDENTIFY_MENTOR:
         abort(403)
-    courses = Course.query.filter(Course.time_start > datetime.now()).order_by(Course.time_start).all()
-    return render_template('course.html', courses=courses)
+    # courses = Course.query.filter(Course.time_start > datetime.now()).order_by(Course.time_start).all()
+    return render_template('course.html')
+
+
+@app.route('/course/men', methods=['GET'])
+@login_required
+def course():
+    if current_user.identify == User.IDENTIFY_STUDENT:
+        abort(403)
+    # courses = Course.query.filter(Course.time_start > datetime.now()).order_by(Course.time_start).all()
+    return render_template('course_men.html')
 
 
 @app.route('/course/<cid>/sign', methods=['GET'])
@@ -491,33 +502,53 @@ def ajax_course_query(type):
     user = current_user
     type = int(type)
     courses = []
-    if user.identify == User.IDENTIFY_MENTOR:
-        abort(403)
-    if type == 0:
-        courses = Course.query.filter(datetime.now() < Course.time_start).order_by(Course.time_start).all()
-    elif type == 1:
-        form = CourseQueryByDepartmentForm()
-        if form.validate_on_submit():
-            department = form.department.data
-            courses = Course.query.join(User.courses_men).filter(User.department == department).order_by(
-                Course.time_start).all()
-        else:
-            return jsonify({'status': BAD})
-    elif type == 2:
-        form = CourseQueryByDateForm()
-        if form.validate_on_submit():
-            time_date_string = form.time_date_string.data
-            match = re.search(r'(\d+)-(\d+)-(\d+)', time_date_string)
-            y, m, d = int(match.group(1)), int(match.group(2)), int(match.group(3))
-            datetime_query_min = datetime(y, m, d)
-            datetime_query_max = datetime_query_min + timedelta(days=1)
-            courses = Course.query.filter(Course.time_start > datetime_query_min).filter(
-                Course.time_start < datetime_query_max).order_by(Course.time_start).all()
-        else:
-            return jsonify({'status': BAD})
-    elif type == 3:
+    if user.identify == User.IDENTIFY_STUDENT:
+        if type == 0:
+            courses = Course.query.filter(datetime.now() < Course.time_start).order_by(Course.time_start).all()
+        elif type == 1:
+            form = CourseQueryByDepartmentForm()
+            if form.validate_on_submit():
+                department = form.department.data
+                courses = Course.query.join(User.courses_men).filter(User.department == department).order_by(
+                    Course.time_start).all()
+            else:
+                return jsonify({'status': BAD})
+        elif type == 2:
+            form = CourseQueryByDateForm()
+            if form.validate_on_submit():
+                time_date_string = form.time_date_string.data
+                match = re.search(r'(\d+)-(\d+)-(\d+)', time_date_string)
+                y, m, d = int(match.group(1)), int(match.group(2)), int(match.group(3))
+                datetime_query_min = datetime(y, m, d)
+                datetime_query_max = datetime_query_min + timedelta(days=1)
+                courses = Course.query.filter(Course.time_start > datetime_query_min).filter(
+                    Course.time_start < datetime_query_max).order_by(Course.time_start).all()
+            else:
+                return jsonify({'status': BAD})
+        elif type == 3:
+            user = User.query.filter(User.id == user.id).first()
+            courses = user.courses_stu.order_by(desc(Course.time_start)).all()
         user = User.query.filter(User.id == user.id).first()
-        courses = user.courses_stu.order_by(desc(Course.time_start)).all()
-    user = User.query.filter(User.id == user.id).first()
-    courses_dict = [course.toDict(user) for course in courses]
-    return jsonify({'status': SUCCESS, 'content': courses_dict})
+        courses_dict = [course.toDict(user) for course in courses]
+        return jsonify({'status': SUCCESS, 'content': courses_dict})
+    elif user.identify == User.IDENTIFY_MENTOR:
+        user = User.query.filter(User.id == user.id).first()
+        if type == 0:
+            courses = Course.query.filter(Course.men_id == user.id).order_by(Course.time_start).all()
+        elif type == 2:
+            form = CourseQueryByDateForm()
+            if form.validate_on_submit():
+                time_date_string = form.time_date_string.data
+                match = re.search(r'(\d+)-(\d+)-(\d+)', time_date_string)
+                y, m, d = int(match.group(1)), int(match.group(2)), int(match.group(3))
+                datetime_query_min = datetime(y, m, d)
+                datetime_query_max = datetime_query_min + timedelta(days=1)
+                courses = Course.query.filter(Course.time_start > datetime_query_min).filter(
+                    Course.time_start < datetime_query_max).filter(Course.men_id == user.id).order_by(
+                    Course.time_start).all()
+            else:
+                return jsonify({'status': BAD})
+        courses_dict = [course.toDict() for course in courses]
+        return jsonify({'status': SUCCESS, 'content': courses_dict})
+    else:
+        abort(403)
