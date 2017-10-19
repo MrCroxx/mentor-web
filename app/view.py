@@ -56,6 +56,31 @@ def logout_lm():
     logout_user()
     return redirect(url_for('cas.logout'))
 
+@app.route('/login/test', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    id = form.id.data
+    password = form.password.data
+    if form.validate_on_submit():
+        u = User.query.filter(User.id == id).first()
+        if u is not None:
+            # if u.testPassword(password):
+            if True:
+                login_user(u, form.remember_me.data)
+                u.login()
+                next = request.args.get('next')
+                if u.chpassword == False:
+                    return redirect(url_for('info_setpassword'))
+                if next is None:
+                    return redirect(url_for('index'))
+                if not is_safe_url(next):
+                    return redirect(url_for('index'))
+                return redirect(next or url_for('index'))
+            else:
+                flash(u'D密码错误!')
+        else:
+            flash(u'D该学号或工号不存在!')
+    return render_template('login.html', form=form)
 
 '''
 @app.route('/login', methods=['GET', 'POST'])
