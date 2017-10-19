@@ -168,6 +168,12 @@ class CourseNewForm(FlaskForm):
     description = StringField(
         'description',
     )
+    location = StringField(
+        'location',
+        validators=[
+            DataRequired(message=u'请输入课程地点!')
+        ]
+    )
     time_date_string = StringField(
         'time_date_string',
         validators=[

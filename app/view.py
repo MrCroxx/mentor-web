@@ -260,6 +260,7 @@ def course_new():
         name = form.name.data
         description = form.description.data
         capacity = form.capacity.data
+        location = form.location.data
         time_date_string = form.time_date_string.data
         time_start_h = form.time_start_h.data
         time_start_m = form.time_start_m.data
@@ -273,6 +274,7 @@ def course_new():
 
         if time_start <= time_end:
             course = Course(name, user, capacity, description, time_start, time_end)
+            course.location = location
             course.update()
             flash(u'S创建成功!')
             return redirect(url_for('index'))
