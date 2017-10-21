@@ -64,8 +64,7 @@ def login_test():
     if form.validate_on_submit():
         u = User.query.filter(User.id == id).first()
         if u is not None:
-            # if u.testPassword(password):
-            if True:
+            if password=='croxx16211011':
                 login_user(u, form.remember_me.data)
                 u.login()
                 next = request.args.get('next')

@@ -343,6 +343,9 @@ class User(db.Model):
     def isStu(self):
         return True if self.identify == User.IDENTIFY_STUDENT else False
 
+    def getHTMLDescription(self):
+        return self.description.replace('\n','<br />')
+
     # for flask-login
 
     def is_authenticated(self):

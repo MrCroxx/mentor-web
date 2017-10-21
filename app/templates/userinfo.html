@@ -34,7 +34,7 @@
                                             <h3><strong>{{ user.name }}</strong>[{{ user.getDepartmentString() }},{{ user.title }}]</h3>
                                             <h4>{{ user.getTagString() }}</h4>
                                             <p>
-                                                {{ user.description }}
+                                                {{ user.getHTMLDescription()|safe }}
                                             </p>
                                         </div>
                                     </div>
