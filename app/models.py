@@ -261,8 +261,8 @@ class User(db.Model):
     department = db.Column(db.String)  # 部门ID
     title = db.Column(db.String)  # 职称(教师)
     description = db.Column(db.String)  # 简介(教师)
-    tag1 = db.Column(db.String)
-    tag2 = db.Column(db.String)
+    tag1 = db.Column(db.String) # 一级标签
+    tag2 = db.Column(db.String) # 二级标签
     score_all = db.Column(db.Float)  # 评分(总)
     score_times = db.Column(db.Integer)  # 评分次数
 

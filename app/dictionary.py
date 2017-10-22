@@ -187,12 +187,13 @@ department_name2id = {
 
 tag1totag2 = {
     'CYJQY99': ['CGDCHCL', 'CXYWRJ0', 'CZNXT00', 'CXTJG00', 'CXNXS00', 'CRGZN00', 'CRJJH00', 'CSWTZSB', 'CJQXX00',
-                'CDSJ000', 'CQKL000', 'CXJWCXJ', 'CHLWJR0', 'CJYWLKX', 'CZHWL00', 'CNMFSCL', 'CFSGFNC'],
+                'CDSJ000', 'CQKL000', 'CXJWCXJ', 'CHLWJR0', 'CJYWLKX', 'CZHWL00', 'CNMFSCL', 'CFSGFNC', 'CWXTX00',
+                'CTXCL00', 'CHKJTWL'],
     'DSWNLGL': ['DDXKJC0', 'DCXSW00', 'DYSSW00', 'DXSGL00', 'DLJSW00', 'DSJGL00', 'DZSGL00', 'DXXDL00', 'DSWJS00',
                 'DQXGL00', 'DSXSW00'],
-    'ESYZDFX': ['EHWLX00', 'EGJQYZD', 'EHWYJ00', 'EXLZX00', 'EXYGH00', 'EZYSY00'],
+    'ESYZDFX': ['EHWLX00', 'EGJQYZD', 'EHWYJ00', 'EXLZX00', 'EXYGH00', 'EZYSY00', 'EZYXZ00'],
     'AJCXX99': ['AZDKZYL', 'AYY0000', 'AJSJZC0', 'AXXDS00', 'AGKGS00', 'AGKSF00', 'ASZFX00', 'AJGLX00', 'ASLX000',
-                'AGKDW00', 'ADWSY00', 'AHXCL00'],
+                'AGKDW00', 'ADWSY00', 'AHXCL00', 'ATXDCJR'],
     'BKYCX99': ['BXKJS00', 'BFRB000', 'BSXJM00', 'BTZB000', 'BGCSJ00', 'BDC0000'],
 }
 
@@ -254,6 +255,11 @@ tag2totag1 = {
     'EXLZX00': 'ESYZDFX',
     'EXYGH00': 'ESYZDFX',
     'EZYSY00': 'ESYZDFX',
+    'EZYXZ00': 'ESYZDFX',
+    'ATXDCJR': 'AJCXX99',
+    'CWXTX00': 'CYJQY99',
+    'CTXCL00': 'CYJQY99',
+    'CHKJTWL': 'CYJQY99',
 }
 
 tag1toname = {
@@ -322,6 +328,11 @@ tag2toname = {
     'EXLZX00': u'心理咨询',
     'EXYGH00': u'学业规划',
     'EZYSY00': u'职业生涯',
+    'EZYXZ00': u'专业选择',
+    'ATXDCJR': u'天线与电磁兼容',
+    'CWXTX00': u'无线通信',
+    'CTXCL00': u'图像处理',
+    'CHKJTWL': u'航空交通网络',
 }
 
 review_type_id2string = {
