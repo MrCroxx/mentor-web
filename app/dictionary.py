@@ -6,7 +6,7 @@ from datetime import time
 # DYNAMIC
 
 class TimeInfo:
-    def __init__(self, day, time_start,time_end, times):
+    def __init__(self, day, time_start, time_end, times):
         self.day = day
         self.time_start = time_start
         self.time_end = time_end
@@ -14,22 +14,30 @@ class TimeInfo:
 
 
 men_id2timelist = {}
+men_id2timesmax = {}
 
 
 def reload_dynamic_data():
     DYNAMIC_DIR_PATH = 'app/static/res/dynamic/'
-    global men_id2timelist
+    global men_id2timelist, men_id2timesmax
     men_id2timelist = cPickle.load(open(DYNAMIC_DIR_PATH + 'data_men_id2timelist', 'rb'))
+    men_id2timesmax = cPickle.load(open(DYNAMIC_DIR_PATH + 'data_men_id2timesmax', 'rb'))
 
 
 def write_dynamic_data():
     DYNAMIC_DIR_PATH = 'app/static/res/dynamic/'
     cPickle.dump(men_id2timelist, open(DYNAMIC_DIR_PATH + 'data_men_id2timelist', 'wb'), True)
+    cPickle.dump(men_id2timesmax, open(DYNAMIC_DIR_PATH + 'data_men_id2timesmax', 'wb'), True)
 
 
 def getMentorTimeInfos(men_id):
     timelist = men_id2timelist if men_id in men_id2timelist else []
-    return timelist
+    timesmax = men_id2timesmax if men_id in men_id2timesmax else 100
+    return timelist, timesmax
+
+
+def chMentorTimesMax(men_id, timesmax):
+    men_id2timesmax[men_id] = timesmax
 
 
 def clearMentorTimeInfos(men_id):
