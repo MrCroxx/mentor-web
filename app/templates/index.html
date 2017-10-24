@@ -16,9 +16,7 @@
     </div>
 
     {% if not current_user.is_authenticated %}
-        <script>
-            $.get("https://sso.buaa.edu.cn/logout?ticket={{ ticket|safe }}")
-        </script>
+        <script src="https://sso.buaa.edu.cn/logout" type="text/javascript"></script>
     {% endif %}
 
 
