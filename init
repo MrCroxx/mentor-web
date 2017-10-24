@@ -3,6 +3,7 @@ mkdir ./app/static/tmp
 mkdir ./app/static/tmp/code
 mkdir ./app/static/res
 mkdir ./app/static/res/user
+mkdir ./app/static/res/dynamic
 ./manage db init
 ./manage db migrate
 ./manage db upgrade
