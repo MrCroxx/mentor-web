@@ -43,8 +43,8 @@ def before_request():
 def index():
     ticket = ''
     print 'index'
-    if 'cas_token_session_key' in session:
-        print session['cas_token_session_key']
+    if '_CAS_TOKEN' in session:
+        print session['_CAS_TOKEN']
     if 'user_id' in session:
         id = session['user_id']
         u = User.query.filter(User.id == id).first()
