@@ -6,42 +6,33 @@ from datetime import time
 # DYNAMIC
 
 class TimeInfo:
-    def __init__(self, day, time):
+    def __init__(self, day, time, times):
         self.day = day
         self.time = time
+        self.time = times
 
 
 men_id2timelist = {}
-men_id2times = {}
 
 
 def reload_dynamic_data():
     DYNAMIC_DIR_PATH = 'app/static/res/dynamic/'
-    global men_id2timelist, men_id2times
+    global men_id2timelist
     men_id2timelist = cPickle.load(open(DYNAMIC_DIR_PATH + 'data_men_id2timelist', 'rb'))
-    men_id2times = cPickle.load(open(DYNAMIC_DIR_PATH + 'data_men_id2times', 'rb'))
 
 
 def write_dynamic_data():
     DYNAMIC_DIR_PATH = 'app/static/res/dynamic/'
     cPickle.dump(men_id2timelist, open(DYNAMIC_DIR_PATH + 'data_men_id2timelist', 'wb'), True)
-    cPickle.dump(men_id2times, open(DYNAMIC_DIR_PATH + 'data_men_id2times', 'wb'), True)
 
 
 def getMentorTimeInfos(men_id):
-    times = men_id2times[men_id] if men_id in men_id2times else 100
     timelist = men_id2timelist if men_id in men_id2timelist else []
-    return times, timelist
+    return timelist
 
 
 def clearMentorTimeInfos(men_id):
-    men_id2times[men_id] = 100
     men_id2timelist[men_id] = []
-    write_dynamic_data()
-
-
-def chMentorTimes(men_id, times):
-    men_id2times[men_id] = times
     write_dynamic_data()
 
 
