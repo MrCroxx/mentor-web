@@ -41,10 +41,6 @@ def before_request():
 @app.route('/')
 @app.route('/index', methods=['GET'])
 def index():
-    ticket = ''
-    print 'index'
-    if '_CAS_TOKEN' in session:
-        ticket =  session['_CAS_TOKEN']
     if 'user_id' in session:
         id = session['user_id']
         u = User.query.filter(User.id == id).first()
@@ -52,13 +48,8 @@ def index():
             login_user(u, True)
             u.login()
         else:
-            pass
-            #return redirect(url_for('login_unknown'))
-    return render_template('index.html',ticket = ticket)
-
-#@app.route('/login/unknown',methods=['GET'])
-#def login_unknown():
-#    redirect(url_for('cas.logout'))
+            flash(u'D抱歉，您的帐号暂未导入导师有约系统，请联系管理员或有关部门！')
+    return render_template('index.html')
 
 
 @app.route('/logout/lm', methods=['GET'])
@@ -66,7 +57,7 @@ def index():
 def logout_lm():
     logout_user()
     return redirect(url_for('index'))
-    #return redirect(url_for('cas.logout'))
+    # return redirect(url_for('cas.logout'))
 
 
 @app.route('/login/test', methods=['GET', 'POST'])
