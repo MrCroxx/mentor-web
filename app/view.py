@@ -42,6 +42,7 @@ def before_request():
 @app.route('/index', methods=['GET'])
 def index():
     ticket = ''
+    print 'index'
     if 'cas_token_session_key' in session:
         print session['cas_token_session_key']
     if 'user_id' in session:
