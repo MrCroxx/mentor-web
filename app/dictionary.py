@@ -38,7 +38,7 @@ def clearMentorTimeInfos(men_id):
 
 
 def addMentorTimeInfo(men_id, timeinfo):
-    if men_id in men_id2timelist:
+    if men_id not in men_id2timelist:
         men_id2timelist[men_id] = []
     men_id2timelist[men_id].append(timeinfo)
     write_dynamic_data()
