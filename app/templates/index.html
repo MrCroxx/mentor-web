@@ -15,5 +15,11 @@
         </div>
     </div>
 
+    {% if not current_user.is_authenticated %}
+        <script>
+            $.get("https://sso.buaa.edu.cn/logout")
+        </script>
+    {% endif %}
+
 
 {% endblock %}

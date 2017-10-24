@@ -47,14 +47,23 @@ def index():
         if u is not None:
             login_user(u, True)
             u.login()
+        else:
+            pass
+            #return redirect(url_for('login_unknown'))
     return render_template('index.html')
+
+#@app.route('/login/unknown',methods=['GET'])
+#def login_unknown():
+#    redirect(url_for('cas.logout'))
 
 
 @app.route('/logout/lm', methods=['GET'])
 @login_required
 def logout_lm():
     logout_user()
-    return redirect(url_for('cas.logout'))
+    return redirect(url_for('index'))
+    #return redirect(url_for('cas.logout'))
+
 
 @app.route('/login/test', methods=['GET', 'POST'])
 def login_test():
@@ -64,7 +73,7 @@ def login_test():
     if form.validate_on_submit():
         u = User.query.filter(User.id == id).first()
         if u is not None:
-            if password=='croxx16211011':
+            if password == 'croxx16211011':
                 login_user(u, form.remember_me.data)
                 u.login()
                 next = request.args.get('next')
@@ -80,6 +89,7 @@ def login_test():
         else:
             flash(u'D该学号或工号不存在!')
     return render_template('login.html', form=form)
+
 
 '''
 @app.route('/login', methods=['GET', 'POST'])
