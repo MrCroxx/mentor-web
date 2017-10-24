@@ -6,10 +6,11 @@ from datetime import time
 # DYNAMIC
 
 class TimeInfo:
-    def __init__(self, day, time, times):
+    def __init__(self, day, time_start,time_end, times):
         self.day = day
-        self.time = time
-        self.time = times
+        self.time_start = time_start
+        self.time_end = time_end
+        self.times = times
 
 
 men_id2timelist = {}
