@@ -38,6 +38,7 @@ def getMentorTimeInfos(men_id):
 
 def chMentorTimesMax(men_id, timesmax):
     men_id2timesmax[men_id] = timesmax
+    write_dynamic_data()
 
 
 def clearMentorTimeInfos(men_id):
@@ -51,6 +52,16 @@ def addMentorTimeInfo(men_id, timeinfo):
     men_id2timelist[men_id].append(timeinfo)
     write_dynamic_data()
 
+
+def validateMontorDatetime(men_id, dt):
+    if men_id not in men_id2timelist:
+        return True
+    timelist = men_id2timelist[men_id]
+    for timeinfo in timelist:
+        # print timeinfo.day, timeinfo.time_start, timeinfo.time_end, dt
+        if dt.weekday() + 1 == timeinfo.day and dt.time() >= timeinfo.time_start and dt.time() <= timeinfo.time_end:
+            return True
+    return False
 
 # STATIC
 

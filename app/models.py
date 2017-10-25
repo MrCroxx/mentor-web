@@ -261,8 +261,8 @@ class User(db.Model):
     department = db.Column(db.String)  # 部门ID
     title = db.Column(db.String)  # 职称(教师)
     description = db.Column(db.String)  # 简介(教师)
-    tag1 = db.Column(db.String) # 一级标签
-    tag2 = db.Column(db.String) # 二级标签
+    tag1 = db.Column(db.String)  # 一级标签
+    tag2 = db.Column(db.String)  # 二级标签
     score_all = db.Column(db.Float)  # 评分(总)
     score_times = db.Column(db.Integer)  # 评分次数
 
@@ -344,7 +344,7 @@ class User(db.Model):
         return True if self.identify == User.IDENTIFY_STUDENT else False
 
     def getHTMLDescription(self):
-        return self.description.replace('\n','<br />')
+        return self.description.replace('\n', '<br />')
 
     # for flask-login
 
@@ -359,3 +359,16 @@ class User(db.Model):
 
     def get_id(self):
         return unicode(self.id)
+
+
+class MentorAvailableTime(db.Model):
+    __tablename__ = 'MentorAvailableTime'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 自增主键 无意义
+    men_id = db.Column(db.String, index=True)  # 导师id
+    weekday = db.Column(db.Integer)  # 星期n
+    time = db.Column(db.Time)  # 时间
+
+    def __init__(self, men_id, weekday, time):
+        self.men_id = men_id
+        self.weekday = weekday
+        self.time = time
