@@ -15,7 +15,4 @@ CSRFProtect(app)
 
 from app import view, models
 CAS(app)
-
-from app.dictionary import write_dynamic_data,reload_dynamic_data
-reload_dynamic_data()
 # jwt = JWT(app, auth.authenticate, auth.identity)
