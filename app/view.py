@@ -155,6 +155,16 @@ def appointment_new(men_id):
     user = current_user
     if user == User.IDENTIFY_MENTOR:
         abort(403)
+    men = User.query.filter(User.id == men_id).filter(User.identify == User.IDENTIFY_MENTOR).first()
+    if men is None:
+        abort(404)
+
+    times = MentorAvailableTime.query.filter(MentorAvailableTime.men_id == men.id).all()
+    useoption = True
+    options = ''
+    if len(times) == 0:
+        useoption = False
+
     form = AppointmentNewForm()
     if form.validate_on_submit():
         description = form.description.data
@@ -173,17 +183,35 @@ def appointment_new(men_id):
 
         if men is not None:
             if time_date >= datetime.now().date() + timedelta(
-                    days=7) and time_date <= datetime.now().date() + timedelta(days=14):
-                appointment = Appointment(user, men, description, time_date, time_time, phone)
-                appointment.update()
-                print 'view', appointment.men
-                flash(u'S预约成功!')
-                return redirect(url_for('appointment_stu'))
+                    days=7) and time_date <= datetime.now().date() + timedelta(days=13):
+
+                if len(times) == 0:
+                    appointment = Appointment(user, men, description, time_date, time_time, phone)
+                    appointment.update()
+                    flash(u'S预约成功!')
+                    return redirect(url_for('appointment_stu'))
+                else:
+                    flag = False
+                    for time in times:
+                        # print time.weekday, time_time.weekday() + 1, time.time, time_time.time()
+                        if time.weekday == time_time.weekday() + 1 and time.time == time_time.time():
+                            if Appointment.query.filter(Appointment.time_time == time_time).filter(
+                                            Appointment.status == Appointment.STATUS_PASS).count() == 0:
+                                appointment = Appointment(user, men, description, time_date, time_time, phone)
+                                appointment.update()
+                                flash(u'S预约成功!')
+                                return redirect(url_for('appointment_stu'))
+                            else:
+                                flag = True
+                                flash(u'D该时间已有其他预约，请选择其他时间!')
+                            break
+                    if not flag:
+                        flash(u'D请选择该导师可用的预约时间!')
             else:
-                flash(u'D非法的日期!')
+                flash(u'D预约时间无效!')
         else:
             flash(u'D该导师不存在!')
-    return render_template('appointment_new.html', form=form)
+    return render_template('appointment_new.html', form=form, men=men)
 
 
 @app.route('/appointment/<aid>/exa', methods=['GET', 'POST'])

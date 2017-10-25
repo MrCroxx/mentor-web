@@ -20,7 +20,7 @@
                             <fieldset>
                                 <legend>创建预约</legend>
                                 {{ form.hidden_tag() }}
-
+                                {{ men.getAvailableTime()|safe }}
                                 <p><font style="color: red">*请同学们仔细查看导师个人简介，选择导师的可选辅导时间进行预约。</font></p>
 
                                 <div class="form-group">
@@ -33,7 +33,7 @@
                                             var date_start = new Date();
                                             var date_end = new Date();
                                             date_start.setDate(date_start.getDate() + 7);
-                                            date_end.setDate(date_end.getDate() + 14);
+                                            date_end.setDate(date_end.getDate() + 13);
                                             $("#time_date_string").datepicker({
                                                 autoHide: true,
                                                 format: "yyyy-mm-dd",

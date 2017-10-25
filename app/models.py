@@ -52,6 +52,19 @@ relation_course_student = db.Table('relation_course_student',
                                    )
 
 
+class MentorAvailableTime(db.Model):
+    __tablename__ = 'MentorAvailableTime'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 自增主键 无意义
+    men_id = db.Column(db.String, index=True)  # 导师id
+    weekday = db.Column(db.Integer)  # 星期n
+    time = db.Column(db.Time)  # 时间
+
+    def __init__(self, men_id, weekday, time):
+        self.men_id = men_id
+        self.weekday = weekday
+        self.time = time
+
+
 class Review(db.Model):
     __tablename__ = 'Review'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -344,7 +357,19 @@ class User(db.Model):
         return True if self.identify == User.IDENTIFY_STUDENT else False
 
     def getHTMLDescription(self):
-        return self.description.replace('\n', '<br />')
+        description = self.description.replace('\n', '<br />')
+        description += self.getAvailableTime()
+        return description
+
+    def getAvailableTime(self):
+        text = ''
+        times = MentorAvailableTime.query.filter(MentorAvailableTime.men_id == self.id).all()
+        if len(times) == 0:
+            return u'<h3>可预约时间</h3><p>暂无限制</p>'
+        text += u'<h3>可预约时间</h3>'
+        for time in times:
+            text += u'<p>星期%s %s</p>' % (weekday_int2char[time.weekday], time.time.strftime('%H:%M'))
+        return text
 
     # for flask-login
 
@@ -359,16 +384,3 @@ class User(db.Model):
 
     def get_id(self):
         return unicode(self.id)
-
-
-class MentorAvailableTime(db.Model):
-    __tablename__ = 'MentorAvailableTime'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 自增主键 无意义
-    men_id = db.Column(db.String, index=True)  # 导师id
-    weekday = db.Column(db.Integer)  # 星期n
-    time = db.Column(db.Time)  # 时间
-
-    def __init__(self, men_id, weekday, time):
-        self.men_id = men_id
-        self.weekday = weekday
-        self.time = time

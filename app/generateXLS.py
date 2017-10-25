@@ -42,7 +42,7 @@ def generateTodayData():
     return path
 
 def generateAllData():
-    path = 'data_all_'+ datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '.xls'
+    path = 'data_all_'+ datetime.now().strftime('%Y-%m-%d-%H:%M:%S') + '.xls'
     appointments = Appointment.query.all()
     generateData(appointments, path)
     return path
