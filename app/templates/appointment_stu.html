@@ -77,7 +77,9 @@
                                         </div>
                                         <script>
                                             var csrftoken = "{{ csrf_token()|safe }}";
-
+                                            $(document).ready(function () {
+                                                ajax_query();
+                                            });
                                             function ajax_query() {
                                                 url = "/ajax/appointment/query";
                                                 data = "";
@@ -135,6 +137,7 @@
                                                         }
                                                     }
                                                 });
+
                                             }
                                         </script>
                                     </div>
