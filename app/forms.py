@@ -56,16 +56,12 @@ class SetPasswordForm(FlaskForm):
     )
 
 
-class MentorQueryByDepartmentForm(FlaskForm):
+class MentorQueryForm(FlaskForm):
     department = StringField(
         'department',
         validators=[
-            DataRequired()
         ]
     )
-
-
-class MentorQueryByTagForm(FlaskForm):
     tag1 = StringField(
         'tag1',
         validators=[
@@ -109,30 +105,30 @@ class AppointmentNewForm(FlaskForm):
     )
 
 
-class AppointmentQueryByDepartmentForm(FlaskForm):
+class AppointmentQueryForm(FlaskForm):
     department = StringField(
         'department',
         validators=[
-            DataRequired()
+            # DataRequired()
         ]
     )
-
-
-class AppointmentQueryByStatusForm(FlaskForm):
-    status = IntegerField(
+    status = StringField(
         'status',
         validators=[
             # DataRequired()
         ]
     )
+    use_date = BooleanField(
+        'use_date',
+        validators=[
 
-
-class AppointmentQueryByDateForm(FlaskForm):
+        ]
+    )
     time_date_string = StringField(
         'time_date_string',
         validators=[
-            DataRequired(),
-            Regexp(r'(\d+)-(\d+)-(\d+)')
+            # DataRequired(),
+            # Regexp(r'(\d+)-(\d+)-(\d+)')
         ]
     )
 

@@ -50,105 +50,8 @@
 
 {% endmacro %}
 
-{% macro user_block_with_modal_appointment_new(user,form) %}
-    <div class="thumbnail btn" data-toggle="modal"
-         data-target="#modal-new-{{ user.id }}" style="text-align: left">
-        <div class="caption">
-            <div class="row">
-                <div class="col-md-4">
-                    <img class="img-thumbnail" style="width: 75px;height:105px;margin: 0px;padding: 0px;"
-                         src="/static/res/user/{{ user.id }}/avatar.png"/>
-                </div>
-                <div class="col-md-8">
-                    <h4 style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap">
-                        <strong>{{ user.name }}</strong>&nbsp;[{{ user.title }}]
-                    </h4>
-                    <h5 style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap">
-                        {{ user.getDepartmentString() }}
-                    </h5>
-                    <h5 style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap">
-                        {{ user.description }}
-                    </h5>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="modal-new-{{ user.id }}" tabindex="-1" role="dialog"
-         aria-labelledby="modal-new-{{ user.id }}-label"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                        &times;
-                    </button>
-                    <h3 class="modal-title" id="modal-new-{{ user.id }}-label">
-                        预约导师
-                    </h3>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h4>预约理由</h4>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <textarea id='form-{{ user.id }}-description' class="form-control" rows="8"></textarea>
-                            <br/>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="btn btn-default pull-right" data-dismiss="modal"> 取消</div>
-                            <div class="btn btn-primary pull-right" onclick="ajax_form_{{ user.id }}_submit()">提交</div>
-                        </div>
-
-                    </div>
-
-
-                    <script>
-                        var csrftoken = "{{ csrf_token()|safe }}";
-
-                        function ajax_form_{{ user.id }}_submit() {
-
-                            $('#modal-new-{{ user.id }}').modal('hide');
-
-                            $.ajax({
-                                type: "POST",
-                                url: "/ajax/appointment/new",
-                                data: "men_id={{ user.id }}" + "&" + "description=" + $('#form-{{ user.id }}-description').val(),
-                                dataType: 'json',
-                                async: false,
-                                beforeSend: function (xhr, settings) {
-                                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                                },
-                                error: function (request) {
-                                    alert("预约失败！[网络错误]");
-                                },
-                                success: function (data) {
-                                    if (data.status == 20000) {
-                                        alert("预约成功！");
-                                    } else {
-                                        alert("预约失败！[数据错误]")
-                                    }
-
-                                }
-                            });
-
-
-                        }
-                    </script>
-
-
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal -->
-    </div>
-{% endmacro %}
-
 {% macro department_options() %}
+    <option value="ALL" selected="selected">全部</option>
     <option value="010100">1-材料科学与工程学院</option>
     <option value="010200">2-电子信息工程学院</option>
     <option value="010300">3-自动化科学与电气工程学院</option>
@@ -191,71 +94,11 @@
 {% endmacro %}
 
 {% macro tag1_options() %}
-    <option value="AJCXX99">基础学习</option>
-    <option value="BKYCX99">科研创新</option>
-    <option value="CYJQY99">研究前沿</option>
-    <option value="DSWNLGL">思维与管理能力</option>
-    <option value="ESYZDFX">生涯指导方向</option>
+    {{ getOptions_tag1()|safe }}
 {% endmacro %}
 
 {% macro tag2_options() %}
-    <option value="AJSJ000">计算机</option>
-    <option value="AZDKZYL">自动控制原理</option>
-    <option value="AYY0000">英语</option>
-    <option value="AJSJZC0">计算机组成</option>
-    <option value="AXXDS00">线性代数</option>
-    <option value="AGKGS00">工科高数</option>
-    <option value="AGKSF00">工科数分</option>
-    <option value="ASZFX00">数值分析</option>
-    <option value="AJGLX00">结构力学</option>
-    <option value="ASLX000">水力学</option>
-    <option value="AGKDW00">工科大物</option>
-    <option value="ADWSY00">大物实验</option>
-    <option value="AHXCL00">化学材料</option>
-    <option value="BXSLWXZ">学术论文写作</option>
-    <option value="BXKJS00">学科竞赛</option>
-    <option value="BFRB000">冯如杯</option>
-    <option value="BSXJM00">数学建模</option>
-    <option value="BTZB000">挑战杯</option>
-    <option value="BGCSJ00">工程实践</option>
-    <option value="BDC0000">大创</option>
-    <option value="CTYNDC0">太阳能电池</option>
-    <option value="CGDCHCL">光电催化材料</option>
-    <option value="CXYWRJ0">旋翼无人机</option>
-    <option value="CZNXT00">智能系统</option>
-    <option value="CXTJG00">系统结构</option>
-    <option value="CXNXS00">虚拟现实</option>
-    <option value="CRGZN00">人工智能</option>
-    <option value="CRJJH00">人机交互</option>
-    <option value="CSWTZSB">生物特征识别</option>
-    <option value="CJQXX00">机器学习</option>
-    <option value="CDSJ000">大数据</option>
-    <option value="CQKL000">区块链</option>
-    <option value="CXJWCXJ">先进微成形技术</option>
-    <option value="CHLWJR0">互联网金融</option>
-    <option value="CJYWLKX">基因网络科学</option>
-    <option value="CZHWL00">智慧物流</option>
-    <option value="CNMFSCL">仿生纳米材料</option>
-    <option value="CFSGFNC">仿生高分子凝胶材料</option>
-    <option value="DQYGL00">企业管理</option>
-    <option value="DDXKJC0">多学科交叉</option>
-    <option value="DCXSW00">创新思维</option>
-    <option value="DYSSW00">艺术思维</option>
-    <option value="DXSGL00">学生管理</option>
-    <option value="DLJSW00">逻辑思维</option>
-    <option value="DSJGL00">时间管理</option>
-    <option value="DZSGL00">知识管理</option>
-    <option value="DXXDL00">学习动力</option>
-    <option value="DSWJS00">思维技术</option>
-    <option value="DSXSW00">数学思维</option>
-    <option value="DQXGL00">情绪管理</option>
-    <option value="EXGLX00">香港留学</option>
-    <option value="EHWLX00">海外留学</option>
-    <option value="EGJQYZD">国际前沿引导</option>
-    <option value="EHWYJ00">海外研究</option>
-    <option value="EXLZX00">心理咨询</option>
-    <option value="EXYGH00">学业规划</option>
-    <option value="EZYSY00">职业生涯</option>
+    {{ getOptions_tag2()|safe }}
 {% endmacro %}
 
 {% macro hour_options() %}

@@ -28,49 +28,6 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <h4>检索方式</h4>
-                                        <select id="type" name="type" class="form-control">
-                                            <option value="0" selected="selected">全部导师</option>
-                                            <option value="1">按学院检索</option>
-                                            <option value="2">按大类检索</option>
-                                            <option value="3">按小类检索</option>
-                                        </select>
-                                        <script language="javascript">
-
-                                            function change() {
-                                                    switch ($("#type").val()) {
-                                                        case "0":
-                                                            $('#type_department').hide();
-                                                            $('#type_tag1').hide();
-                                                            $('#type_tag2').hide();
-                                                            break;
-                                                        case "1":
-                                                            $('#type_department').show();
-                                                            $('#type_tag1').hide();
-                                                            $('#type_tag2').hide();
-                                                            break;
-                                                        case "2":
-                                                            $('#type_department').hide();
-                                                            $('#type_tag1').show();
-                                                            $('#type_tag2').hide();
-                                                            break;
-                                                        case "3":
-                                                            $('#type_department').hide();
-                                                            $('#type_tag1').hide();
-                                                            $('#type_tag2').show();
-                                                            break;
-                                                    }
-                                                }
-
-                                            $(document).ready(function () {
-
-                                                change();
-
-                                                $("#type").change(function () {
-                                                    change();
-                                                });
-
-                                            });
-                                        </script>
                                     </div>
                                 </div>
                                 <div class="row" id="type_department">
@@ -110,7 +67,7 @@
                                             function ajax_query() {
                                                 $.ajax({
                                                     type: "POST",
-                                                    url: "/ajax/mentor/query/" + $('#type').val(),
+                                                    url: "/ajax/mentor/query",
                                                     data: "department=" + $('#department').val()
                                                     + "&" + "tag1=" + $('#tag1').val()
                                                     + "&" + "tag2=" + $('#tag2').val()
@@ -125,6 +82,7 @@
                                                     },
                                                     success: function (data) {
                                                         if (data.status == 20000) {
+
                                                             $('#table_mentors tbody').empty();
                                                             mentors = data.content;
                                                             for (i = 0; i < mentors.length; i++) {
@@ -139,6 +97,7 @@
                                                                     + "</tr>";
                                                                 $('#table_mentors tbody').append(row);
                                                             }
+                                                            location.hash = "#" + Math.random().toString(36).substr(2);
                                                         } else {
                                                             alert("获取失败![数据错误]");
                                                         }

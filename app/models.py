@@ -132,7 +132,6 @@ class Appointment(db.Model):
         self.phone = phone
 
     def toDict(self):
-        print self.men
         return {
             'id': self.id,
             'status': self.status,

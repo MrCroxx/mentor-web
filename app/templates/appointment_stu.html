@@ -31,49 +31,13 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <h4>检索方式</h4>
-                                            <select id="type" name="type" class="form-control">
-                                                <option value="0" selected="selected">全部预约</option>
-                                                <option value="1">按状态检索</option>
-                                                <option value="2">按学院检索</option>
-                                                <option value="3">按日期检索</option>
-                                            </select>
-                                            <script language="javascript">
-                                                $(document).ready(function () {
-                                                    $('#type_status').hide();
-                                                    $('#type_department').hide();
-                                                    $('#type_time_date').hide();
-                                                    $("#type").change(function () {
-                                                        switch ($("#type").val()) {
-                                                            case "0":
-                                                                $('#type_status').hide();
-                                                                $('#type_department').hide();
-                                                                $('#type_time_date').hide();
-                                                                break;
-                                                            case "1":
-                                                                $('#type_status').show();
-                                                                $('#type_department').hide();
-                                                                $('#type_time_date').hide();
-                                                                break;
-                                                            case "2":
-                                                                $('#type_status').hide();
-                                                                $('#type_department').show();
-                                                                $('#type_time_date').hide();
-                                                                break;
-                                                            case "3":
-                                                                $('#type_status').hide();
-                                                                $('#type_department').hide();
-                                                                $('#type_time_date').show();
-                                                                break;
-                                                        }
-                                                    });
-                                                });
-                                            </script>
                                         </div>
                                     </div>
                                     <div id="type_status" class="row">
                                         <div class="col-md-12">
                                             <h4>状态</h4>
                                             <select id="status" name="status" class="form-control">
+                                                <option value="ALL" selected="selected">全部</option>
                                                 <option value="0">未审核</option>
                                                 <option value="1">通过</option>
                                                 <option value="2">拒绝</option>
@@ -91,11 +55,13 @@
                                     <div id="type_time_date" class="row">
                                         <div class="col-md-12">
                                             <h4>日期</h4>
+                                            <input id="use_date" name="use_date" type="checkbox">使用日期筛选
                                             <input id="time_date_string" name="time_date_string" type="text"
                                                    class="form-control"><br/>
 
                                             <script type="text/javascript">
                                                 $("#time_date_string").datepicker({
+                                                    autoPick: true,
                                                     autoHide: true,
                                                     format: "yyyy-mm-dd",
                                                     language: 'zh-CN'
@@ -113,11 +79,16 @@
                                             var csrftoken = "{{ csrf_token()|safe }}";
 
                                             function ajax_query() {
-                                                url = "/ajax/appointment/query/" + $("#type").val();
+                                                url = "/ajax/appointment/query";
                                                 data = "";
                                                 data += "&status=" + $("#status").val();
                                                 data += "&department=" + $("#department").val();
                                                 data += "&time_date_string=" + $("#time_date_string").val();
+                                                if ($('#use_date').is(":checked")) {
+                                                    data += "&use_date=true";
+                                                } else {
+                                                    data += "&use_date=false";
+                                                }
                                                 $.ajax({
                                                     type: "POST",
                                                     url: url,
@@ -132,6 +103,7 @@
                                                     },
                                                     success: function (data) {
                                                         if (data.status == 20000) {
+                                                            location.hash = "#" + Math.random().toString(36).substr(2);
                                                             $('#table_appointments tbody').empty();
                                                             appointments = data.content;
                                                             for (i = 0; i < appointments.length; i++) {

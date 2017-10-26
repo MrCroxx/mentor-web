@@ -12,11 +12,15 @@ from app.models import *
 from datetime import datetime, timedelta
 from config import SUCCESS, BAD
 import os, base64, math, json, re
+from jinja2 import Template
 
 # Configs and View for Login
 
 lm.login_view = 'login'
 lm.login_message = u'W请先登录!'
+
+app.jinja_env.globals['getOptions_tag1'] = getOptions_tag1
+app.jinja_env.globals['getOptions_tag2'] = getOptions_tag2
 
 
 def is_safe_url(target):
@@ -437,102 +441,64 @@ def getIdentifyingcode():
     return jsonify({'code_uri': code_uri})
 
 
-@app.route('/ajax/mentor/query/<type>', methods=['POST'])
+@app.route('/ajax/mentor/query', methods=['POST'])
 @login_required
-def ajax_mentor_query(type):
+def ajax_mentor_query():
     user = current_user
-    type = int(type)
     if user.identify == User.IDENTIFY_MENTOR:
         abort(403)
 
-    if type == 0:
-        mentors = User.query.filter(User.identify == User.IDENTIFY_MENTOR).all()
-    elif type == 1:
-        form = MentorQueryByDepartmentForm()
-        if form.validate_on_submit():
-            department = form.department.data
-            mentors = User.query.filter(User.identify == User.IDENTIFY_MENTOR).filter(
-                User.department == department).all()
-        else:
-            return jsonify({'status': BAD})
-    elif type == 2:
-        form = MentorQueryByTagForm()
-        if form.validate_on_submit():
-            tag1 = form.tag1.data
-            tag2 = form.tag2.data
-            mentors = User.query.filter(User.identify == User.IDENTIFY_MENTOR).filter(
-                User.tag1.ilike('%' + tag1 + '%')).all()
-        else:
-            return jsonify({'status': BAD})
-    elif type == 3:
-        form = MentorQueryByTagForm()
-        if form.validate_on_submit():
-            tag1 = form.tag1.data
-            tag2 = form.tag2.data
-            mentors = User.query.filter(User.identify == User.IDENTIFY_MENTOR).filter(
-                User.tag2.ilike('%' + tag2 + '%')).all()
-        else:
-            return jsonify({'status': BAD})
-    mentors_dict = [mentor.toDict() for mentor in mentors]
-    return jsonify({'status': SUCCESS, 'content': mentors_dict})
+    form = MentorQueryForm()
+    if form.validate_on_submit():
+        department = form.department.data
+        tag1 = form.tag1.data
+        tag2 = form.tag2.data
+        mentors = User.query.filter(User.identify == User.IDENTIFY_MENTOR)
+        if department != 'ALL':
+            mentors = mentors.filter(User.department == department)
+        if tag1 != 'ALL':
+            mentors = mentors.filter(User.tag1.ilike('%' + tag1 + '%'))
+        if tag2 != 'ALL':
+            mentors = mentors.filter(User.tag2.ilike('%' + tag2 + '%'))
+        mentors = mentors.all()
+        mentors_dict = [mentor.toDict() for mentor in mentors]
+        return jsonify({'status': SUCCESS, 'content': mentors_dict})
+    else:
+        return jsonify({'status': BAD})
 
 
-@app.route('/ajax/appointment/query/<type>', methods=['POST'])
+@app.route('/ajax/appointment/query', methods=['POST'])
 @login_required
-def ajax_appointment_query(type):
+def ajax_appointment_query():
     user = current_user
-    appointments = []
     identify = user.identify
-    type = int(type)
-    if type == 0:
-        if user.identify == User.IDENTIFY_MENTOR:
-            appointments = sorted(user.appointments_men, key=lambda appointment: appointment.time_date, reverse=True)
-        elif user.identify == User.IDENTIFY_STUDENT:
-            appointments = sorted(user.appointments_stu, key=lambda appointment: appointment.time_date, reverse=True)
-    elif type == 1:
-        form = AppointmentQueryByStatusForm()
-        if form.validate_on_submit():
-            status = form.status.data
-            if user.identify == User.IDENTIFY_MENTOR:
-                appointments = Appointment.query.filter(Appointment.men_id == user.id).filter(
-                    Appointment.status == status).order_by(desc(Appointment.time_date)).all()
-            elif user.identify == User.IDENTIFY_STUDENT:
-                appointments = Appointment.query.filter(Appointment.stu_id == user.id).filter(
-                    Appointment.status == status).order_by(desc(Appointment.time_date)).all()
+    form = AppointmentQueryForm()
+    if form.validate_on_submit():
+        if identify == User.IDENTIFY_MENTOR:
+            appointments = Appointment.query.filter(Appointment.men_id == user.id)
         else:
-            return jsonify({'status': BAD})
-    elif type == 2:
-        form = AppointmentQueryByDepartmentForm()
-        if form.validate_on_submit():
-            department = form.department.data
-            if user.identify == User.IDENTIFY_MENTOR:
-                appointments = Appointment.query.filter(Appointment.men_id == user.id).join(
-                    User.appointments_men).filter(User.department == department).order_by(
-                    desc(Appointment.time_submit)).all()
-            elif user.identify == User.IDENTIFY_STUDENT:
-                appointments = Appointment.query.filter(Appointment.stu_id == user.id).join(
-                    User.appointments_stu).filter(User.department == department).order_by(
-                    desc(Appointment.time_submit)).all()
-        else:
-            return jsonify({'status': BAD})
-    elif type == 3:
-        form = AppointmentQueryByDateForm()
-        if form.validate_on_submit():
+            appointments = Appointment.query.filter(Appointment.stu_id == user.id)
+        status = form.status.data
+        department = form.department.data
+        use_date = form.use_date.data
+        if use_date:
             time_date_string = form.time_date_string.data
             match = re.search(r'(\d+)-(\d+)-(\d+)', time_date_string)
             y, m, d = int(match.group(1)), int(match.group(2)), int(match.group(3))
             time_date = date(y, m, d)
+            appointments = appointments.filter(Appointment.time_date == time_date)
+        if status != 'ALL':
+            appointments = appointments.filter(Appointment.status == status)
+        if department != 'ALL':
             if user.identify == User.IDENTIFY_MENTOR:
-                appointments = Appointment.query.filter(Appointment.men_id == user.id).filter(
-                    Appointment.time_date == time_date).order_by(desc(Appointment.time_date)).all()
+                appointments = appointments.join(User.appointments_stu).filter(User.department == department)
             elif user.identify == User.IDENTIFY_STUDENT:
-                appointments = Appointment.query.filter(Appointment.stu_id == user.id).filter(
-                    Appointment.time_date == time_date).order_by(desc(Appointment.time_date)).all()
-        else:
-            return jsonify({'status': BAD})
-    appointments_dict = [appointment.toDict() for appointment in appointments]
-    return jsonify({'status': SUCCESS, 'content': appointments_dict})
-
+                appointments = appointments.join(User.appointments_men).filter(User.department == department)
+        appointments = appointments.order_by(desc(Appointment.time_date)).all()
+        appointments_dict = [appointment.toDict() for appointment in appointments]
+        return jsonify({'status': SUCCESS, 'content': appointments_dict})
+    else:
+        return jsonify({'status': BAD})
 
 @app.route('/ajax/appointment/<aid>/score', methods=['POST'])
 @login_required

@@ -353,3 +353,17 @@ weekday_int2char = {
     6: u'六',
     7: u'日',
 }
+
+# DYNAMIC
+
+def getOptions_tag1():
+    s = u'<option value="ALL" selected="selected">全部</option>'
+    for t1,name in tag1toname.iteritems():
+        s += u'<option value="%s">%s</option>' %(t1,name)
+    return s
+
+def getOptions_tag2():
+    s = u'<option value="ALL" selected="selected">全部</option>'
+    for t2,name in tag2toname.iteritems():
+        s += u'<option value="%s">%s</option>' %(t2,name)
+    return s
