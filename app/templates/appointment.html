@@ -58,51 +58,67 @@
                             <div class="panel-body">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <div id='query' onclick="ajax_query()" class="btn btn-primary"
+                                        <div id='query' onclick="setHash()" class="btn btn-primary"
                                              style="width: 100%">搜索
                                         </div>
                                         <script>
                                             var csrftoken = "{{ csrf_token()|safe }}";
+                                            $(document).ready(function () {
+                                                location.hash = "#department=ALL&tag1=ALL&tag2=ALL";
+                                            });
+
+                                            function setHash() {
+                                                location.hash = "#department=" + $('#department').val()
+                                                    + "&" + "tag1=" + $('#tag1').val()
+                                                    + "&" + "tag2=" + $('#tag2').val();
+                                            }
+
+                                            window.onhashchange = function () {
+                                                ajax_query();
+                                            };
+                                            window.onload = function () {
+                                                if (location.hash.length > 10) {
+                                                    ajax_query();
+                                                }
+                                            };
 
                                             function ajax_query() {
+                                                $('#table_mentors tbody').empty();
                                                 $.ajax({
-                                                    type: "POST",
-                                                    url: "/ajax/mentor/query",
-                                                    data: "department=" + $('#department').val()
-                                                    + "&" + "tag1=" + $('#tag1').val()
-                                                    + "&" + "tag2=" + $('#tag2').val()
-                                                    ,
-                                                    dataType: 'json',
-                                                    async: false,
-                                                    beforeSend: function (xhr, settings) {
-                                                        xhr.setRequestHeader("X-CSRFToken", csrftoken)
-                                                    },
-                                                    error: function (request) {
-                                                        alert("获取失败![网络错误]");
-                                                    },
-                                                    success: function (data) {
-                                                        if (data.status == 20000) {
-
-                                                            $('#table_mentors tbody').empty();
-                                                            mentors = data.content;
-                                                            for (i = 0; i < mentors.length; i++) {
-                                                                mentor = mentors[i];
-                                                                button = "<a href=\"/appointment/new/" + mentor.id + "\" class=\"btn btn-primary btn-sm\">预约</a>"
-                                                                var row = "<tr>"
-                                                                    + "<td>" + "<a href=\"/user/" + mentor.id + "\">" + mentor.name + "</a>" + "</td>"
-                                                                    + "<td>" + mentor.department + "(" + mentor.title + ")" + "</td>"
-                                                                    + "<td>" + mentor.appointment_num + "</td>"
-                                                                    + "<td>" + mentor.score + "%" + "</td>"
-                                                                    + "<td>" + button + "</td>"
-                                                                    + "</tr>";
-                                                                $('#table_mentors tbody').append(row);
+                                                        type: "POST",
+                                                        url: "/ajax/mentor/query",
+                                                        data: location.hash.substr(1)
+                                                        ,
+                                                        dataType: 'json',
+                                                        async: false,
+                                                        beforeSend: function (xhr, settings) {
+                                                            xhr.setRequestHeader("X-CSRFToken", csrftoken)
+                                                        },
+                                                        error: function (request) {
+                                                            alert("获取失败![网络错误]");
+                                                        },
+                                                        success: function (data) {
+                                                            if (data.status == 20000) {
+                                                                $('#table_mentors tbody').empty();
+                                                                mentors = data.content;
+                                                                for (i = 0; i < mentors.length; i++) {
+                                                                    mentor = mentors[i];
+                                                                    button = "<a href=\"/appointment/new/" + mentor.id + "\" class=\"btn btn-primary btn-sm\">预约</a>"
+                                                                    var row = "<tr>"
+                                                                        + "<td>" + "<a href=\"/user/" + mentor.id + "\">" + mentor.name + "</a>" + "</td>"
+                                                                        + "<td>" + mentor.department + "(" + mentor.title + ")" + "</td>"
+                                                                        + "<td>" + mentor.appointment_num + "</td>"
+                                                                        + "<td>" + mentor.score + "%" + "</td>"
+                                                                        + "<td>" + button + "</td>"
+                                                                        + "</tr>";
+                                                                    $('#table_mentors tbody').append(row);
+                                                                }
+                                                            } else {
+                                                                alert("获取失败![数据错误]");
                                                             }
-                                                            location.hash = "#" + Math.random().toString(36).substr(2);
-                                                        } else {
-                                                            alert("获取失败![数据错误]");
                                                         }
                                                     }
-                                                });
+                                                );
                                             }
                                         </script>
                                     </div>
