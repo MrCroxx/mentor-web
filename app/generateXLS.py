@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-import xlwt
+import xlwt,os
 from app.models import *
 
 
@@ -29,20 +29,27 @@ def generateData(appointments, path):
 
 
 def generateWaitingData():
-    path = 'appointments_waiting_' + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '.xls'
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    filename = 'appointments_waiting_' + datetime.now().strftime('%Y-%m-%d-%H:%M:%S') + '.xls'
+    path = os.path.join(basedir,filename)
+    print path
     appointments = Appointment.query.filter(Appointment.status == Appointment.STATUS_WAITING).all()
     generateData(appointments, path)
     return path
 
 
-def generateTodayData():
-    path = 'data_' + datetime.now().strftime('%Y-%m-%d') + '.xls'
+def generateDailyData():
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    filename = 'appointments_daily_' + datetime.now().strftime('%Y-%m-%d') + '.xls'
+    path = os.path.join(basedir, filename)
     appointments = Appointment.query.filter(Appointment.time_submit >= datetime.now().date()).all()
     generateData(appointments, path)
     return path
 
 def generateAllData():
-    path = 'data_all_'+ datetime.now().strftime('%Y-%m-%d-%H:%M:%S') + '.xls'
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    filename = 'appointments_all_'+ datetime.now().strftime('%Y-%m-%d-%H:%M:%S') + '.xls'
+    path = os.path.join(basedir, filename)
     appointments = Appointment.query.all()
     generateData(appointments, path)
     return path

@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-from flask import render_template, url_for, redirect, flash, request, abort, session, g, jsonify, Response
+from flask import render_template, url_for, redirect, flash, request, abort, session, g, jsonify, send_file
 from app import app, lm
 from sqlalchemy import desc
 from app.forms import *
@@ -12,6 +12,7 @@ from app.models import *
 from datetime import datetime, timedelta
 from config import SUCCESS, BAD
 import os, base64, math, json, re
+from generateXLS import *
 from jinja2 import Template
 
 # Configs and View for Login
@@ -577,3 +578,29 @@ def ajax_course_query(type):
         return jsonify({'status': SUCCESS, 'content': courses_dict})
     else:
         abort(403)
+
+# Generate XLS
+
+@app.route('/data/xls/all',methods=['GET'])
+@login_required
+def data_xls_all():
+    if current_user.id != '14141075':
+        abort(403)
+    path = generateAllData()
+    return send_file(path,as_attachment=True)
+
+@app.route('/data/xls/waiting',methods=['GET'])
+@login_required
+def data_xls_waiting():
+    if current_user.id != '14141075':
+        abort(403)
+    path = generateWaitingData()
+    return send_file(path,as_attachment=True)
+
+@app.route('/data/xls/daily',methods=['GET'])
+@login_required
+def data_xls_daily():
+    if current_user.id != '14141075':
+        abort(403)
+    path = generateDailyData()
+    return send_file(path,as_attachment=True)
