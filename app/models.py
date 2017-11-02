@@ -370,6 +370,9 @@ class User(db.Model):
             text += u'<p>星期%s %s</p>' % (weekday_int2char[time.weekday], time.time.strftime('%H:%M'))
         return text
 
+    def canAccessData(self):
+        return self.id in data_access_ids
+
     # for flask-login
 
     def is_authenticated(self):

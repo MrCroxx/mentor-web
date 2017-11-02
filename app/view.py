@@ -501,6 +501,7 @@ def ajax_appointment_query():
     else:
         return jsonify({'status': BAD})
 
+
 @app.route('/ajax/appointment/<aid>/score', methods=['POST'])
 @login_required
 def ajax_appointment_score(aid):
@@ -579,28 +580,37 @@ def ajax_course_query(type):
     else:
         abort(403)
 
+
 # Generate XLS
 
-@app.route('/data/xls/all',methods=['GET'])
+@app.route('/data/xls/all', methods=['GET'])
 @login_required
 def data_xls_all():
-    if current_user.id != '14141075':
+    user = current_user
+    user = User.query.filter(User.id == user.id).first()
+    if not user.canAccessData():
         abort(403)
     path = generateAllData()
-    return send_file(path,as_attachment=True)
+    return send_file(path, as_attachment=True)
 
-@app.route('/data/xls/waiting',methods=['GET'])
+
+@app.route('/data/xls/waiting', methods=['GET'])
 @login_required
 def data_xls_waiting():
-    if current_user.id != '14141075':
+    user = current_user
+    user = User.query.filter(User.id == user.id).first()
+    if not user.canAccessData():
         abort(403)
     path = generateWaitingData()
-    return send_file(path,as_attachment=True)
+    return send_file(path, as_attachment=True)
 
-@app.route('/data/xls/daily',methods=['GET'])
+
+@app.route('/data/xls/daily', methods=['GET'])
 @login_required
 def data_xls_daily():
-    if current_user.id != '14141075':
+    user = current_user
+    user = User.query.filter(User.id == user.id).first()
+    if not user.canAccessData():
         abort(403)
     path = generateDailyData()
-    return send_file(path,as_attachment=True)
+    return send_file(path, as_attachment=True)
