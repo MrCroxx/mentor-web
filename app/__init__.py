@@ -16,7 +16,7 @@ app.config.from_object('config')
 db = SQLAlchemy(app)
 lm = LoginManager(app)
 CSRFProtect(app)
-oracle_db = cx_Oracle.connect(ORACLE_CONN)
+# oracle_db = cx_Oracle.connect(ORACLE_CONN)
 
 from app import view, models
 CAS(app)

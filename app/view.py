@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 from flask import render_template, url_for, redirect, flash, request, abort, session, g, jsonify, send_file
-from app import app, lm, oracle_db
+from app import app, lm
 from app.secret import *
 from sqlalchemy import desc
 from app.forms import *
@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 from config import SUCCESS, BAD
 import os, base64, math, json, re
 from generateXLS import *
+import cx_Oracle
 from jinja2 import Template
 
 # Configs and View for Login
@@ -44,6 +45,7 @@ def before_request():
 # ORACLE APIs
 
 def queryORACLE(XH):
+    oracle_db = cx_Oracle.connect(ORACLE_CONN)
     cursor = oracle_db.cursor()
     cursor.execute(
         "SELECT XM,YXDM FROM %s WHERE XH='%s'" % (ORACLE_VIEW, XH))
