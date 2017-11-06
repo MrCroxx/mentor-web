@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*-
 
 from flask import render_template, url_for, redirect, flash, request, abort, session, g, jsonify, send_file
-from app import app, lm
+from app import app, lm, oracle_db
+from app.secret import *
 from sqlalchemy import desc
 from app.forms import *
 from flask_login import login_user, logout_user, login_required, current_user
@@ -40,6 +41,15 @@ def before_request():
     g.user = current_user
 
 
+# ORACLE APIs
+
+def queryORACLE(XH):
+    cursor = oracle_db.cursor()
+    cursor.execute(
+        "SELECT XM,YXDM FROM %s WHERE XH='%s'" % (ORACLE_VIEW, XH))
+    return cursor.fetchone()
+
+
 # web views
 
 
@@ -48,12 +58,25 @@ def before_request():
 def index():
     if 'user_id' in session:
         id = session['user_id']
-        u = User.query.filter(User.id == id).first()
-        if u is not None:
-            login_user(u, True)
-            u.login()
+        user = User.query.filter(User.id == id).first()
+        if user is not None:
+            login_user(user, True)
+            user.login()
+            if user.identify == User.IDENTIFY_STUDENT:
+                res = queryORACLE(user.id)
+                if res is not None:
+                    name,department_id = res
+                    user.department = department_id
+                    user.update()
+
         else:
-            flash(u'D抱歉，您的帐号暂未导入导师有约系统，请联系管理员或有关部门！')
+            res = queryORACLE(user.id)
+            if res is not None:
+                name, department_id = res
+                user = User(id,id,name,User.IDENTIFY_STUDENT,department_id,'','','','')
+                user.update()
+            else:
+                flash(u'D抱歉，您的帐号暂未导入导师有约系统，请联系管理员或有关部门！')
     return render_template('index.html')
 
 
