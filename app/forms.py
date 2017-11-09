@@ -247,7 +247,15 @@ class ReviewNewForm(FlaskForm):
         ]
     )
 
-class StudentQueryForm(FlaskForm):
+
+class AdminStudentQueryForm(FlaskForm):
+    id = StringField('id')
+    name = StringField('name')
+    department = StringField('department')
+    grade = StringField('grade')
+
+
+class AdminMentorQueryForm(FlaskForm):
     id = StringField('id')
     name = StringField('name')
     department = StringField('department')

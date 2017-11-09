@@ -51,6 +51,39 @@ relation_course_student = db.Table('relation_course_student',
                                              db.ForeignKey('User.id'))
                                    )
 
+class Tag(db.Model):
+    __tablename__ = 'Tag'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 自增主键 无意义
+    tag1id = db.Column(db.String)
+    tag1name = db.Column(db.String)
+    tag2id = db.Column(db.String)
+    tag2name = db.Column(db.String)
+
+    def __init__(self,tag1id,tag1name,tag2id,tag2name):
+        self.tag1id = tag1id
+        self.tag2id = tag2id
+        self.tag1name = tag1name
+        self.tag2name = tag2name
+        self.update()
+
+    def update(self):
+        db.session.add(self)
+        db.session.commit()
+
+class User2Tag(db.Model):
+    __tablename__ = 'User2Tag'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 自增主键 无意义
+    men_id = db.String(db.String)
+    tag_id = db.Column(db.Integer)
+
+    def __init__(self,men_id,tag_id):
+        self.men_id = men_id
+        self.tag_id = tag_id
+
+    def update(self):
+        db.session.add(self)
+        db.session.commit()
+
 
 class MentorAvailableTime(db.Model):
     __tablename__ = 'MentorAvailableTime'
@@ -373,6 +406,14 @@ class User(db.Model):
 
     def canAccessData(self):
         return self.id in data_access_ids
+
+    def getAppointmentCount(self):
+        if self.identify == User.IDENTIFY_STUDENT:
+            return len(self.appointments_stu)
+        elif self.identify == User.IDENTIFY_MENTOR:
+            return len(self.appointments_men)
+        else:
+            return 0
 
     # for flask-login
 

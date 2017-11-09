@@ -93,6 +93,10 @@
     <option value="019900">航空科学与技术国家实验室大飞机班</option>
 {% endmacro %}
 
+{% macro department_all_options() %}
+    {{ getOptions_department_all()|safe }}
+{% endmacro %}
+
 {% macro tag1_options() %}
     {{ getOptions_tag1()|safe }}
 {% endmacro %}
@@ -127,7 +131,16 @@
     <option value="3">成长类</option>
 {% endmacro %}
 
+{% macro tagtable(tag1,tag2list) %}
+    <div class="panel panel-default">
+        <div class="panel-heading">Panel heading</div>
 
+        <!-- Table -->
+        <table class="table">
+            ...
+        </table>
+    </div>
+{% endmacro %}
 
 
 

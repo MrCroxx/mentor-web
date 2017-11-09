@@ -24,6 +24,7 @@ lm.login_message = u'W请先登录!'
 
 app.jinja_env.globals['getOptions_tag1'] = getOptions_tag1
 app.jinja_env.globals['getOptions_tag2'] = getOptions_tag2
+app.jinja_env.globals['getOptions_department_all'] = getOptions_department_all
 
 
 def is_safe_url(target):
@@ -493,22 +494,50 @@ def admin_student():
     user = current_user
     if user.identify != User.IDENTIFY_ADMIN:
         abort(403)
-    form = StudentQueryForm()
+    form = AdminStudentQueryForm()
     stus = []
     if form.validate_on_submit():
+
         id = form.id.data
         name = form.name.data
         department = form.department.data
-        stus = User.query.filter(User.identify==User.IDENTIFY_STUDENT)
+        grade = form.grade.data
+
+        stus = User.query.filter(User.identify == User.IDENTIFY_STUDENT)
         if id != '':
-            stus = stus.filter(User.id==id)
+            stus = stus.filter(User.id == id)
         if name != '':
-            stus = stus.filter(User.name==name)
+            stus = stus.filter(User.name == name)
         if department != 'ALL':
-            stus = stus.filter(User.department==department)
+            stus = stus.filter(User.department == department)
+        if grade != '':
+            stus = stus.filter(User.id.ilike(str(grade) + '%'))
         stus = stus.all()
     return render_template('student.html', form=form, stus=stus)
 
+@app.route('/admin/mentor', methods=['GET', 'POST'])
+@login_required
+def admin_mentor():
+    user = current_user
+    if user.identify != User.IDENTIFY_ADMIN:
+        abort(403)
+    form = AdminMentorQueryForm()
+    mens = []
+    if form.validate_on_submit():
+
+        id = form.id.data
+        name = form.name.data
+        department = form.department.data
+
+        mens = User.query.filter(User.identify == User.IDENTIFY_MENTOR)
+        if id != '':
+            mens = mens.filter(User.id == id)
+        if name != '':
+            mens = mens.filter(User.name == name)
+        if department != 'ALL':
+            mens = mens.filter(User.department == department)
+        mens = mens.all()
+    return render_template('mentor.html', form=form, mens=mens)
 
 # ajax routes
 

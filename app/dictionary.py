@@ -377,3 +377,9 @@ def getOptions_tag2():
     for t2, name in tag2toname.iteritems():
         s += u'<option value="%s">%s</option>' % (t2, name)
     return s
+
+def getOptions_department_all():
+    s = u'<option value="ALL" selected="selected">全部</option>'
+    for id, name in department_id2name.iteritems():
+        s += u'<option value="%s">%s</option>' % (id, name)
+    return s

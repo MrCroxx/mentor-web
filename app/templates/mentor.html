@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% from 'macros.html' import department_options,tag1_options,tag2_options %}
+{% from 'macros.html' import department_options,tag1_options,tag2_options,department_all_options %}
 
 {% block head %}
-    <title>导师有约管理系统 —— 学生查询</title>
+    <title>导师有约管理系统 ——  导师查询</title>
 {% endblock %}
 
 {% block content %}
@@ -12,7 +12,7 @@
             <div class="col-md-12">
                 <div class="row">
                     <div class="col-md-12">
-                        <h2>学生查询</h2>
+                        <h2>导师查询</h2>
                     </div>
                 </div>
 
@@ -20,7 +20,7 @@
                     <div class="col-md-12">
                         <div class="panel panel-primary">
                             <div class="panel-heading">
-                                <div class="panel-title">学生检索</div>
+                                <div class="panel-title">导师检索</div>
                             </div>
                             <div class="panel-body">
 
@@ -30,7 +30,7 @@
                                         {{ form.hidden_tag() }}
 
                                         <div class="form-group">
-                                            <label for="id" class="col-md-3 control-label">学号</label>
+                                            <label for="id" class="col-md-3 control-label">工号</label>
                                             <div class="col-md-6">
                                                 {{ form.id(class="form-control") }}
                                             </div>
@@ -42,18 +42,11 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="department" class="col-md-3 control-label">学院</label>
+                                            <label for="department" class="col-md-3 control-label">部门</label>
                                             <div class="col-md-6">
                                                 <select id="department" name="department" class="form-control">
-                                                    {{ department_options() }}
+                                                    {{ department_all_options() }}
                                                 </select>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="grade" class="col-md-3 control-label">入学年份</label>
-                                            <div class="col-md-6">
-                                                {{ form.grade(class="form-control") }}
-                                                <p><font style="color: red">*入学年份按照学号前两位检索</font> </p>
                                             </div>
                                         </div>
                                         <div class="form-group">
@@ -75,20 +68,20 @@
                             <table id="table_mentors" class="table table-striped">
                                 <thead>
                                 <tr>
-                                    <th class="col-md-2">学号</th>
+                                    <th class="col-md-2">工号</th>
                                     <th class="col-md-2">姓名</th>
-                                    <th class="col-md-2">学院</th>
+                                    <th class="col-md-3">部门</th>
                                     <th class="col-md-2">预约数</th>
                                     <th class="col-md-3">操作</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for stu in stus %}
+                                {% for men in mens %}
                                     <tr>
-                                        <td>{{ stu.id }}</td>
-                                        <td>{{ stu.name }}</td>
-                                        <td>{{ stu.getDepartmentString() }}</td>
-                                        <td>{{ stu.getAppointmentCount() }}</td>
+                                        <td>{{ men.id }}</td>
+                                        <td>{{ men.name }}</td>
+                                        <td>{{ men.getDepartmentString() }}</td>
+                                        <td>{{ men.getAppointmentCount() }}</td>
                                         <td></td>
                                     </tr>
                                 {% endfor %}
