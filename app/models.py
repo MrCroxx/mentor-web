@@ -51,6 +51,7 @@ relation_course_student = db.Table('relation_course_student',
                                              db.ForeignKey('User.id'))
                                    )
 
+
 class Tag(db.Model):
     __tablename__ = 'Tag'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 自增主键 无意义
@@ -59,24 +60,24 @@ class Tag(db.Model):
     tag2id = db.Column(db.String)
     tag2name = db.Column(db.String)
 
-    def __init__(self,tag1id,tag1name,tag2id,tag2name):
+    def __init__(self, tag1id, tag1name, tag2id, tag2name):
         self.tag1id = tag1id
         self.tag2id = tag2id
         self.tag1name = tag1name
         self.tag2name = tag2name
-        self.update()
 
     def update(self):
         db.session.add(self)
         db.session.commit()
 
+
 class User2Tag(db.Model):
     __tablename__ = 'User2Tag'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 自增主键 无意义
-    men_id = db.String(db.String)
+    men_id = db.Column=(db.String)
     tag_id = db.Column(db.Integer)
 
-    def __init__(self,men_id,tag_id):
+    def __init__(self, men_id, tag_id):
         self.men_id = men_id
         self.tag_id = tag_id
 
@@ -376,12 +377,26 @@ class User(db.Model):
         return department_id2name[self.department]
 
     def getTagString(self):
+        tagids = User2Tag.query.filter(User2Tag.men_id==self.id).all()
+        print tagids
+        tags = []
+        for tagid in tagids:
+            tags.append(User2Tag.query.filter(User2Tag.tag_id==tagid).first())
+        s = ''
+        for tag in tags:
+            s += '[%s]%s,' % (tag.tag1name,tag.tag2name)
+        print s
+        return s
+
+    '''
+    def getTagString(self):
         tags = re.findall(ur'(?<=#)[^#]+?(?=#)', self.tag2)
         s = ''
         for t2 in tags:
             t1 = tag2totag1[t2]
             s += '[%s]%s,' % (tag1toname[t1], tag2toname[t2])
         return s
+    '''
 
     def isMen(self):
         return True if self.identify == User.IDENTIFY_MENTOR else False
