@@ -74,7 +74,7 @@ class Tag(db.Model):
 class User2Tag(db.Model):
     __tablename__ = 'User2Tag'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 自增主键 无意义
-    men_id = db.Column=(db.String)
+    men_id = db.Column(db.String)
     tag_id = db.Column(db.Integer)
 
     def __init__(self, men_id, tag_id):
