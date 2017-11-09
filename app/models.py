@@ -290,6 +290,7 @@ class User(db.Model):
     # 常量
     IDENTIFY_MENTOR = 1
     IDENTIFY_STUDENT = 0
+    IDENTIFY_ADMIN = 2
 
     def __init__(self, id, password, name, identiry, department, tag1, tag2, title, description):
         self.id = id

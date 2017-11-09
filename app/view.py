@@ -67,7 +67,7 @@ def index():
             if user.identify == User.IDENTIFY_STUDENT:
                 res = queryORACLE(user.id)
                 if res is not None:
-                    name,department_id = res
+                    name, department_id = res
                     user.department = department_id
                     user.update()
 
@@ -75,7 +75,7 @@ def index():
             res = queryORACLE(user.id)
             if res is not None:
                 name, department_id = res
-                user = User(id,id,name,User.IDENTIFY_STUDENT,department_id,'','','','')
+                user = User(id, id, name, User.IDENTIFY_STUDENT, department_id, '', '', '', '')
                 user.update()
             else:
                 flash(u'D抱歉，您的帐号暂未导入导师有约系统，请联系管理员或有关部门！')
@@ -88,6 +88,35 @@ def logout_lm():
     logout_user()
     return redirect(url_for('index'))
     # return redirect(url_for('cas.logout'))
+
+
+@app.route('/login/admin', methods=['GET', 'POST'])
+def login_admin():
+    form = LoginForm()
+    id = form.id.data
+    password = form.password.data
+    if form.validate_on_submit():
+        u = User.query.filter(User.id == id).first()
+        if u is not None:
+            if u.identify == User.IDENTIFY_ADMIN:
+                if u.testPassword(password):
+                    login_user(u, form.remember_me.data)
+                    u.login()
+                    next = request.args.get('next')
+                    if u.chpassword == False:
+                        return redirect(url_for('info_setpassword'))
+                    if next is None:
+                        return redirect(url_for('index'))
+                    if not is_safe_url(next):
+                        return redirect(url_for('index'))
+                    return redirect(next or url_for('index'))
+                else:
+                    flash(u'D密码错误!')
+            else:
+                flash(u'D权限不足!')
+        else:
+            flash(u'D该学号或工号不存在!')
+    return render_template('login.html', form=form)
 
 
 @app.route('/login/test', methods=['GET', 'POST'])
@@ -458,7 +487,31 @@ def review(aid):
     return render_template('review.html', appointment=appointment, review=review)
 
 
+@app.route('/admin/student', methods=['GET', 'POST'])
+@login_required
+def admin_student():
+    user = current_user
+    if user.identify != User.IDENTIFY_ADMIN:
+        abort(403)
+    form = StudentQueryForm()
+    stus = []
+    if form.validate_on_submit():
+        id = form.id.data
+        name = form.name.data
+        department = form.department.data
+        stus = User.query.filter(User.identify==User.IDENTIFY_STUDENT)
+        if id != '':
+            stus = stus.filter(User.id==id)
+        if name != '':
+            stus = stus.filter(User.name==name)
+        if department != 'ALL':
+            stus = stus.filter(User.department==department)
+        stus = stus.all()
+    return render_template('student.html', form=form, stus=stus)
+
+
 # ajax routes
+
 @app.route('/ajax/getIdentifyingcode', methods=['POST'])
 def getIdentifyingcode():
     code_img, code_text = drawIdentifyingCode()

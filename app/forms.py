@@ -246,3 +246,8 @@ class ReviewNewForm(FlaskForm):
             DataRequired(message=u'请填写解决方案!')
         ]
     )
+
+class StudentQueryForm(FlaskForm):
+    id = StringField('id')
+    name = StringField('name')
+    department = StringField('department')

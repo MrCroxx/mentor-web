@@ -93,6 +93,8 @@ department_id2name = {
     '017700': u'致真书院',
     '017900': u'知行书院',
     '019900': u'航空科学与技术国家实验室大飞机班',
+    '010000': u'民族预科学院',
+    '013700': u'北航学院',
 }
 department_name2id = {
     u'宣传部/新闻中心': '020400',
@@ -185,6 +187,8 @@ department_name2id = {
     u'致真书院': '017700',
     u'知行书院': '017900',
     u'航空科学与技术国家实验室大飞机班': '019900',
+    u'民族预科学院': '010000',
+    u'北航学院': '013700',
 }
 
 tag1totag2 = {
@@ -355,19 +359,21 @@ weekday_int2char = {
 }
 
 data_access_ids = [
-    '17373268','17373166','16101017','17377322','17379175','14091044','14141075',
+    '17373268', '17373166', '16101017', '17377322', '17379175', '14091044', '14141075',
 ]
+
 
 # DYNAMIC
 
 def getOptions_tag1():
     s = u'<option value="ALL" selected="selected">全部</option>'
-    for t1,name in tag1toname.iteritems():
-        s += u'<option value="%s">%s</option>' %(t1,name)
+    for t1, name in tag1toname.iteritems():
+        s += u'<option value="%s">%s</option>' % (t1, name)
     return s
+
 
 def getOptions_tag2():
     s = u'<option value="ALL" selected="selected">全部</option>'
-    for t2,name in tag2toname.iteritems():
-        s += u'<option value="%s">%s</option>' %(t2,name)
+    for t2, name in tag2toname.iteritems():
+        s += u'<option value="%s">%s</option>' % (t2, name)
     return s
