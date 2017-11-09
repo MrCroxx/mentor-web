@@ -375,7 +375,8 @@ class User(db.Model):
 
     def getDepartmentString(self):
         return department_id2name[self.department]
-
+    
+    '''
     def getTagString(self):
         tagids = User2Tag.query.filter(User2Tag.men_id==self.id).all()
         print tagids
@@ -387,8 +388,8 @@ class User(db.Model):
             s += '[%s]%s,' % (tag.tag1name,tag.tag2name)
         print s
         return s
-
     '''
+
     def getTagString(self):
         tags = re.findall(ur'(?<=#)[^#]+?(?=#)', self.tag2)
         s = ''
@@ -396,7 +397,7 @@ class User(db.Model):
             t1 = tag2totag1[t2]
             s += '[%s]%s,' % (tag1toname[t1], tag2toname[t2])
         return s
-    '''
+
 
     def isMen(self):
         return True if self.identify == User.IDENTIFY_MENTOR else False
