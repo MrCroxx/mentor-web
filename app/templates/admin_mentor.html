@@ -2,7 +2,7 @@
 {% from 'macros.html' import department_options,tag1_options,tag2_options,department_all_options %}
 
 {% block head %}
-    <title>导师有约管理系统 ——  导师查询</title>
+    <title>导师有约管理系统 —— 导师查询</title>
 {% endblock %}
 
 {% block content %}
@@ -50,15 +50,26 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <div class="col-md-6 col-md-offset-3">
-                                                <button type="submit" class="btn btn-primary">提交</button>
+                                            <div class="col-md-12">
+                                                <button type="submit" class="btn btn-primary" style="width: 100%">搜索
+                                                </button>
                                             </div>
                                         </div>
 
 
                                     </fieldset>
+
                                 </form>
 
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="btn btn-primary" data-toggle="modal"
+                                 data-target="#upload-modal" style="width: 100%">
+                                <span class="glyphicon glyphicon-upload"></span> 导入导师信息
                             </div>
                         </div>
                     </div>
@@ -93,6 +104,63 @@
 
                 </div>
             </div>
+        </div>
+
+
+        <div class="modal fade" id="upload-modal" tabindex="-1" role="dialog"
+             aria-labelledby="upload-modal-label"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="upload-modal-label">
+                            导入导师信息
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" action="/admin/mentor/upload/xls" enctype="multipart/form-data">
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    {{ xlsform.hidden_tag() }}
+                                    <div class="row">
+                                        <div class="center-block" style="width: 300px">
+                                            <div class="form-group form-inline">
+                                                <input id="file" name='file' type="file" style="display:none">
+                                                <div class="input-append">
+                                                    <input id="choosefile" class="form-control" type="text">
+                                                    <a class="btn btn-primary" onclick="$('#file').click();">选择文件</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <script type="text/javascript">
+                                        $('#file').change(function () {
+                                            $('#choosefile').val($(this).val());
+                                        });
+                                    </script>
+                                </div>
+                            </div>
+                            <div class="row">
+
+                                <div class="col-md-12">
+
+                                    <button type="submit" class="btn btn-primary pull-right">
+                                        确定
+                                    </button>
+                                    <button class="btn btn-default pull-right" data-dismiss="modal">
+                                        取消
+                                    </button>
+
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
         </div>
 
 {% endblock %}

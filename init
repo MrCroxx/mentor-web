@@ -4,6 +4,7 @@ mkdir ./app/static/tmp/code
 mkdir ./app/static/res
 mkdir ./app/static/res/user
 mkdir ./app/static/res/dynamic
+mkdir ./app/static/tmp/xls
 ./manage db init
 ./manage db migrate
 ./manage db upgrade

@@ -31,6 +31,10 @@ CAS_LOGIN_ROUTE = '/'
 CAS_LOGOUT_ROUTE = '/logout'
 CAS_VALIDATE_ROUTE = '/serviceValidate'
 
+# UPLOAD
+
+UPLOADED_XLS_DEST = 'app/static/tmp/xls'
+
 # JWT
 
 # JWT_AUTH_URL_RULE = '/jwt/login'

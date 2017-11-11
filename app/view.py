@@ -8,14 +8,14 @@ from app.forms import *
 from flask_login import login_user, logout_user, login_required, current_user
 from urlparse import urlparse, urljoin
 from identifyingcode import drawIdentifyingCode
-from PIL import Image
 from app.models import *
 from datetime import datetime, timedelta
 from config import SUCCESS, BAD
 import os, base64, math, json, re
 from generateXLS import *
+from app.processXLSData import *
 import cx_Oracle
-from jinja2 import Template
+import xlrd
 
 # Configs and View for Login
 
@@ -132,8 +132,8 @@ def login_test():
                 login_user(u, form.remember_me.data)
                 u.login()
                 next = request.args.get('next')
-                if u.chpassword == False:
-                    return redirect(url_for('info_setpassword'))
+                # if u.chpassword == False:
+                #    return redirect(url_for('info_setpassword'))
                 if next is None:
                     return redirect(url_for('index'))
                 if not is_safe_url(next):
@@ -201,12 +201,56 @@ def info_setpassword():
     return render_template('info_setpassword.html', form=form)
 
 
-@app.route('/appointment', methods=['GET'])
+@app.route('/appointment', methods=['GET', 'POST'])
 @login_required
 def appointment():
-    if current_user.identify == User.IDENTIFY_MENTOR:
+    if current_user.identify != User.IDENTIFY_STUDENT:
         abort(403)
-    return render_template('appointment.html')
+    mentors_dict = []
+    form = MentorQueryForm()
+    if form.validate_on_submit():
+        department = form.department.data
+        tag1 = form.tag1.data
+        tag2 = form.tag2.data
+        mentors = User.query.filter(User.identify == User.IDENTIFY_MENTOR)
+        if department != 'ALL':
+            mentors = mentors.filter(User.department == department)
+        # if tag1 != 'ALL':
+        #    mentors = mentors.filter(User.tag1.ilike('%' + tag1 + '%'))
+        # if tag2 != 'ALL':
+        #    mentors = mentors.filter(User.tag2.ilike('%' + tag2 + '%'))
+        mentors = mentors.all()
+        print len(mentors)
+        if tag1 != 'ALL':
+            mens_tmp = []
+            for mentor in mentors:
+                uts = User2Tag.query.filter(User2Tag.men_id == mentor.id).all()
+                flag = False
+                for ut in uts:
+                    tag = Tag.query.filter(Tag.id == ut.tag_id).first()
+                    if tag.tag1id == tag1:
+                        flag = True
+                        break
+                if flag:
+                    mens_tmp.append(mentor)
+            mentors = mens_tmp
+        print len(mentors)
+        if tag2 != 'ALL':
+            mens_tmp = []
+            for mentor in mentors:
+                uts = User2Tag.query.filter(User2Tag.men_id == mentor.id).all()
+                flag = False
+                for ut in uts:
+                    tag = Tag.query.filter(Tag.id == ut.tag_id).first()
+                    if tag.tag2id == tag2:
+                        flag = True
+                        break
+                if flag:
+                    mens_tmp.append(mentor)
+            mentors = mens_tmp
+        print len(mentors)
+        mentors_dict = [mentor.toDict() for mentor in mentors]
+    return render_template('appointment.html', mens=mentors_dict, form=form)
 
 
 @app.route('/appointment/new/<men_id>', methods=['GET', 'POST'])
@@ -323,22 +367,30 @@ def appointment_delete(aid):
     return redirect(url_for('appointment_stu'))
 
 
-@app.route('/appointment/men', methods=['GET'])
+@app.route('/appointment/men', methods=['GET', 'POST'])
 @login_required
 def appointment_men():
     user = current_user
-    if user.identify == User.IDENTIFY_STUDENT:
+    if user.identify != User.IDENTIFY_MENTOR:
         abort(403)
-    return render_template('appointment_men.html')
+    form = AppointmentQueryForm()
+    appointments = []
+    if form.validate_on_submit():
+        appointments = queryAppointment(form, user)
+    return render_template('appointment_men.html', form=form, appointments=appointments)
 
 
-@app.route('/appointment/stu', methods=['GET'])
+@app.route('/appointment/stu', methods=['GET', 'POST'])
 @login_required
 def appointment_stu():
     user = current_user
-    if user.identify == User.IDENTIFY_MENTOR:
+    if user.identify != User.IDENTIFY_STUDENT:
         abort(403)
-    return render_template('appointment_stu.html')
+    form = AppointmentQueryForm()
+    appointments = []
+    if form.validate_on_submit():
+        appointments = queryAppointment(form, user)
+    return render_template('appointment_stu.html', form=form, appointments=appointments)
 
 
 @app.route('/course/new', methods=['GET', 'POST'])
@@ -513,7 +565,8 @@ def admin_student():
         if grade != '':
             stus = stus.filter(User.id.ilike(str(grade) + '%'))
         stus = stus.all()
-    return render_template('student.html', form=form, stus=stus)
+    return render_template('admin_student.html', form=form, stus=stus)
+
 
 @app.route('/admin/mentor', methods=['GET', 'POST'])
 @login_required
@@ -523,6 +576,7 @@ def admin_mentor():
         abort(403)
     form = AdminMentorQueryForm()
     mens = []
+    xlsform = MentorXLSForm()
     if form.validate_on_submit():
 
         id = form.id.data
@@ -537,7 +591,57 @@ def admin_mentor():
         if department != 'ALL':
             mens = mens.filter(User.department == department)
         mens = mens.all()
-    return render_template('mentor.html', form=form, mens=mens)
+    return render_template('admin_mentor.html', form=form, mens=mens, xlsform=xlsform)
+
+
+@app.route('/admin/tag', methods=['GET', 'POST'])
+@login_required
+def admin_tag():
+    user = current_user
+    if user.identify != User.IDENTIFY_ADMIN:
+        abort(403)
+    form = TagNewForm()
+    if form.validate_on_submit():
+        tag1id = form.tag1id.data
+        tag1name = form.tag1name.data
+        tag2id = form.tag2id.data
+        tag2name = form.tag2name.data
+        tag = Tag(tag1id, tag1name, tag2id, tag2name)
+        tag.update()
+    tags = Tag.query.order_by(Tag.tag1id, Tag.tag2id).all()
+    return render_template('admin_tag.html', tags=tags, form=form)
+
+
+@app.route('/admin/tag/<tagid>/delete', methods=['GET'])
+@login_required
+def admin_tag_delete(tagid):
+    user = current_user
+    if user.identify != User.IDENTIFY_ADMIN:
+        abort(403)
+    tag = Tag.query.filter(Tag.id == tagid).first()
+    if tag is not None:
+        uts = User2Tag.query.filter(User2Tag.tag_id == tag.id).all()
+        for ut in uts:
+            ut.delete()
+        tag.delete()
+    return redirect(url_for('admin_tag'))
+
+@app.route('/admin/mentor/upload/xls',methods=['POST'])
+@login_required
+def admin_mentor_upload_xls():
+    user = current_user
+    if user.identify != User.IDENTIFY_ADMIN:
+        abort(403)
+
+    form = MentorXLSForm()
+    if form.validate_on_submit():
+        file = form.file.data
+        file.filename = 'mentor-%s.xls' % (datetime.now().strftime("%Y-%m-%d-%H:%M:%S"))
+        realname = xls.save(file)
+        flag,err = mentor_xls_import('app/static/tmp/xls/'+realname)
+        print flag,err
+    return redirect(url_for('admin_mentor'))
+
 
 # ajax routes
 
@@ -549,6 +653,7 @@ def getIdentifyingcode():
     return jsonify({'code_uri': code_uri})
 
 
+'''
 @app.route('/ajax/mentor/query', methods=['POST'])
 @login_required
 def ajax_mentor_query():
@@ -564,17 +669,47 @@ def ajax_mentor_query():
         mentors = User.query.filter(User.identify == User.IDENTIFY_MENTOR)
         if department != 'ALL':
             mentors = mentors.filter(User.department == department)
-        if tag1 != 'ALL':
-            mentors = mentors.filter(User.tag1.ilike('%' + tag1 + '%'))
-        if tag2 != 'ALL':
-            mentors = mentors.filter(User.tag2.ilike('%' + tag2 + '%'))
+        # if tag1 != 'ALL':
+        #    mentors = mentors.filter(User.tag1.ilike('%' + tag1 + '%'))
+        # if tag2 != 'ALL':
+        #    mentors = mentors.filter(User.tag2.ilike('%' + tag2 + '%'))
         mentors = mentors.all()
+        print len(mentors)
+        if tag1 != 'ALL':
+            mens_tmp = []
+            for mentor in mentors:
+                uts = User2Tag.query.filter(User2Tag.men_id == mentor.id).all()
+                flag = False
+                for ut in uts:
+                    tag = Tag.query.filter(Tag.id == ut.tag_id).first()
+                    if tag.tag1id == tag1:
+                        flag = True
+                        break
+                if flag:
+                    mens_tmp.append(mentor)
+            mentors = mens_tmp
+        print len(mentors)
+        if tag2 != 'ALL':
+            mens_tmp = []
+            for mentor in mentors:
+                uts = User2Tag.query.filter(User2Tag.men_id == mentor.id).all()
+                flag = False
+                for ut in uts:
+                    tag = Tag.query.filter(Tag.id == ut.tag_id).first()
+                    if tag.tag2id == tag2:
+                        flag = True
+                        break
+                if flag:
+                    mens_tmp.append(mentor)
+            mentors = mens_tmp
+        print len(mentors)
         mentors_dict = [mentor.toDict() for mentor in mentors]
         return jsonify({'status': SUCCESS, 'content': mentors_dict})
     else:
         return jsonify({'status': BAD})
+'''
 
-
+'''
 @app.route('/ajax/appointment/query', methods=['POST'])
 @login_required
 def ajax_appointment_query():
@@ -607,6 +742,7 @@ def ajax_appointment_query():
         return jsonify({'status': SUCCESS, 'content': appointments_dict})
     else:
         return jsonify({'status': BAD})
+'''
 
 
 @app.route('/ajax/appointment/<aid>/score', methods=['POST'])
@@ -686,6 +822,34 @@ def ajax_course_query(type):
         return jsonify({'status': SUCCESS, 'content': courses_dict})
     else:
         abort(403)
+
+
+# Query Functions
+
+def queryAppointment(form, user):
+    if user.identify == User.IDENTIFY_MENTOR:
+        appointments = Appointment.query.filter(Appointment.men_id == user.id)
+    else:
+        appointments = Appointment.query.filter(Appointment.stu_id == user.id)
+    status = form.status.data
+    department = form.department.data
+    use_date = form.use_date.data
+    if use_date:
+        time_date_string = form.time_date_string.data
+        match = re.search(r'(\d+)-(\d+)-(\d+)', time_date_string)
+        y, m, d = int(match.group(1)), int(match.group(2)), int(match.group(3))
+        time_date = date(y, m, d)
+        appointments = appointments.filter(Appointment.time_date == time_date)
+    if status != 'ALL':
+        appointments = appointments.filter(Appointment.status == status)
+    if department != 'ALL':
+        if user.identify == User.IDENTIFY_MENTOR:
+            appointments = appointments.join(User.appointments_stu).filter(User.department == department)
+        elif user.identify == User.IDENTIFY_STUDENT:
+            appointments = appointments.join(User.appointments_men).filter(User.department == department)
+    appointments = appointments.order_by(desc(Appointment.time_date)).all()
+    appointments_dict = [appointment.toDict() for appointment in appointments]
+    return appointments_dict
 
 
 # Generate XLS

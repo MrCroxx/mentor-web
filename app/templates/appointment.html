@@ -24,106 +24,44 @@
                             </div>
                             <div class="panel-body">
 
-
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <h4>检索方式</h4>
-                                    </div>
-                                </div>
-                                <div class="row" id="type_department">
-                                    <div class="col-md-12">
-                                        <h4>学院</h4>
-                                        <select id="department" name="department" class="form-control">
-                                            {{ department_options() }}
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="row" id="type_tag1">
-                                    <div class="col-md-12">
-                                        <h4>大类标签</h4>
-                                        <select id="tag1" name="tag1" class="form-control">
-                                            {{ tag1_options() }}
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="row" id="type_tag2">
-                                    <div class="col-md-12">
-                                        <h4>细分标签</h4>
-                                        <select id="tag2" name="tag2" class="form-control">
-                                            {{ tag2_options() }}
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="panel-body">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div id='query' onclick="setHash()" class="btn btn-primary"
-                                             style="width: 100%">搜索
+                                <form class="form-horizontal" method="post">
+                                    <fieldset>
+                                        <legend>检索方式</legend>
+                                        {{ form.hidden_tag() }}
+                                        <div class="row" id="type_department">
+                                            <div class="col-md-12">
+                                                <h4>学院</h4>
+                                                <select id="department" name="department" class="form-control">
+                                                    {{ department_options() }}
+                                                </select>
+                                            </div>
                                         </div>
-                                        <script>
-                                            var csrftoken = "{{ csrf_token()|safe }}";
-                                            $(document).ready(function () {
-                                                location.hash = "#department=ALL&tag1=ALL&tag2=ALL";
-                                            });
+                                        <div class="row" id="type_tag1">
+                                            <div class="col-md-12">
+                                                <h4>大类标签</h4>
+                                                <select id="tag1" name="tag1" class="form-control">
+                                                    {{ tag1_options() }}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row" id="type_tag2">
+                                            <div class="col-md-12">
+                                                <h4>细分标签</h4>
+                                                <select id="tag2" name="tag2" class="form-control">
+                                                    {{ tag2_options() }}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-12">
+                                                <br>
+                                                <button type="submit" class="btn btn-primary" style="width: 100%">搜索
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </form>
 
-                                            function setHash() {
-                                                location.hash = "#department=" + $('#department').val()
-                                                    + "&" + "tag1=" + $('#tag1').val()
-                                                    + "&" + "tag2=" + $('#tag2').val();
-                                            }
-
-                                            window.onhashchange = function () {
-                                                ajax_query();
-                                            };
-                                            window.onload = function () {
-                                                if (location.hash.length > 10) {
-                                                    ajax_query();
-                                                }
-                                            };
-
-                                            function ajax_query() {
-                                                $('#table_mentors tbody').empty();
-                                                $.ajax({
-                                                        type: "POST",
-                                                        url: "/ajax/mentor/query",
-                                                        data: location.hash.substr(1)
-                                                        ,
-                                                        dataType: 'json',
-                                                        async: false,
-                                                        beforeSend: function (xhr, settings) {
-                                                            xhr.setRequestHeader("X-CSRFToken", csrftoken)
-                                                        },
-                                                        error: function (request) {
-                                                            alert("获取失败![网络错误]");
-                                                        },
-                                                        success: function (data) {
-                                                            if (data.status == 20000) {
-                                                                $('#table_mentors tbody').empty();
-                                                                mentors = data.content;
-                                                                for (i = 0; i < mentors.length; i++) {
-                                                                    mentor = mentors[i];
-                                                                    button = "<a href=\"/appointment/new/" + mentor.id + "\" class=\"btn btn-primary btn-sm\">预约</a>"
-                                                                    var row = "<tr>"
-                                                                        + "<td>" + "<a href=\"/user/" + mentor.id + "\">" + mentor.name + "</a>" + "</td>"
-                                                                        + "<td>" + mentor.department + "(" + mentor.title + ")" + "</td>"
-                                                                        + "<td>" + mentor.appointment_num + "</td>"
-                                                                        + "<td>" + mentor.score + "%" + "</td>"
-                                                                        + "<td>" + button + "</td>"
-                                                                        + "</tr>";
-                                                                    $('#table_mentors tbody').append(row);
-                                                                }
-                                                            } else {
-                                                                alert("获取失败![数据错误]");
-                                                            }
-                                                        }
-                                                    }
-                                                );
-                                            }
-                                        </script>
-                                    </div>
-
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -142,7 +80,16 @@
                             </tr>
                             </thead>
                             <tbody>
-
+                            {% for men in mens %}
+                                <tr>
+                                    <td><a href="/user/{{ men.id }}">{{ men.name }}</a></td>
+                                    <td>{{ men.department }}({{ men.title }})</td>
+                                    <td>{{ men.appointment_num }}</td>
+                                    <td>{{ men.score }}%</td>
+                                    <td><a href="/appointment/new/{{ men.id }}" class="btn btn-primary btn-sm">预约</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
                             </tbody>
                         </table>
                     </div>

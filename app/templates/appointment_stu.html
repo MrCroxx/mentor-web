@@ -27,121 +27,55 @@
                             </div>
 
                             <div class="panel-body">
-                                <div class="panel-body">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <h4>检索方式</h4>
+                                <form class="form-horizontal" method="post">
+                                    <fieldset>
+                                        <legend>检索方式</legend>
+                                        {{ form.hidden_tag() }}
+                                        <div id="type_status" class="row">
+                                            <div class="col-md-12">
+                                                <h4>状态</h4>
+                                                <select id="status" name="status" class="form-control">
+                                                    <option value="ALL" selected="selected">全部</option>
+                                                    <option value="0">未审核</option>
+                                                    <option value="1">通过</option>
+                                                    <option value="2">拒绝</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div id="type_status" class="row">
-                                        <div class="col-md-12">
-                                            <h4>状态</h4>
-                                            <select id="status" name="status" class="form-control">
-                                                <option value="ALL" selected="selected">全部</option>
-                                                <option value="0">未审核</option>
-                                                <option value="1">通过</option>
-                                                <option value="2">拒绝</option>
-                                            </select>
+                                        <div id="type_department" class="row">
+                                            <div class="col-md-12">
+                                                <h4>学院</h4>
+                                                <select id="department" name="department" class="form-control">
+                                                    {{ department_options() }}
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div id="type_department" class="row">
-                                        <div class="col-md-12">
-                                            <h4>学院</h4>
-                                            <select id="department" name="department" class="form-control">
-                                                {{ department_options() }}
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div id="type_time_date" class="row">
-                                        <div class="col-md-12">
-                                            <h4>日期</h4>
-                                            <input id="use_date" name="use_date" type="checkbox">使用日期筛选
-                                            <input id="time_date_string" name="time_date_string" type="text"
-                                                   class="form-control"><br/>
+                                        <div id="type_time_date" class="row">
+                                            <div class="col-md-12">
+                                                <h4>日期</h4>
+                                                <input id="use_date" name="use_date" type="checkbox">使用日期筛选
+                                                <input id="time_date_string" name="time_date_string" type="text"
+                                                       class="form-control"><br/>
 
-                                            <script type="text/javascript">
-                                                $("#time_date_string").datepicker({
-                                                    autoPick: true,
-                                                    autoHide: true,
-                                                    format: "yyyy-mm-dd",
-                                                    language: 'zh-CN'
-                                                });
-                                            </script>
+                                                <script type="text/javascript">
+                                                    $("#time_date_string").datepicker({
+                                                        autoPick: true,
+                                                        autoHide: true,
+                                                        format: "yyyy-mm-dd",
+                                                        language: 'zh-CN'
+                                                    });
+                                                </script>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div id='query' onclick="ajax_query()" class="btn btn-primary"
-                                             style="width: 100%">搜索
+                                        <div class="form-group">
+                                            <div class="col-md-12">
+                                                <br>
+                                                <button type="submit" class="btn btn-primary" style="width: 100%">搜索
+                                                </button>
+                                            </div>
                                         </div>
-                                        <script>
-                                            var csrftoken = "{{ csrf_token()|safe }}";
-                                            $(document).ready(function () {
-                                                ajax_query();
-                                            });
-                                            function ajax_query() {
-                                                url = "/ajax/appointment/query";
-                                                data = "";
-                                                data += "&status=" + $("#status").val();
-                                                data += "&department=" + $("#department").val();
-                                                data += "&time_date_string=" + $("#time_date_string").val();
-                                                if ($('#use_date').is(":checked")) {
-                                                    data += "&use_date=true";
-                                                } else {
-                                                    data += "&use_date=false";
-                                                }
-                                                $.ajax({
-                                                    type: "POST",
-                                                    url: url,
-                                                    data: data,
-                                                    dataType: 'json',
-                                                    async: false,
-                                                    beforeSend: function (xhr, settings) {
-                                                        xhr.setRequestHeader("X-CSRFToken", csrftoken)
-                                                    },
-                                                    error: function (request) {
-                                                        alert("获取失败![网络错误]");
-                                                    },
-                                                    success: function (data) {
-                                                        if (data.status == 20000) {
-                                                            location.hash = "#" + Math.random().toString(36).substr(2);
-                                                            $('#table_appointments tbody').empty();
-                                                            appointments = data.content;
-                                                            for (i = 0; i < appointments.length; i++) {
-                                                                appointment = appointments[i];
-                                                                statustext = "";
-                                                                button = "";
-                                                                if (appointment.status == 0) {
-                                                                    statustext = "<span style=\"color: blue\">未审核</span>";
-                                                                    button = "<a href=\"/appointment/" + appointment.id + "/view" + "\" class=\"btn btn-default btn-sm\">查看/撤销</a>";
-                                                                } else if (appointment.status == 1) {
-                                                                    statustext = "<span style=\"color: green\">通过</span>";
-                                                                    button = "<a href=\"/appointment/" + appointment.id + "/view" + "\" class=\"btn btn-primary btn-sm\">查看/评价</a>";
-                                                                } else if (appointment.status == 2) {
-                                                                    statustext = "<span style=\"color: red\">未通过</span>";
-                                                                    button = "<a href=\"/appointment/" + appointment.id + "/view" + "\" class=\"btn btn-danger btn-sm\">查看</a>";
-                                                                }
-                                                                var row = "<tr>"
-                                                                    + "<td>" + appointment.men_name + "</td>"
-                                                                    + "<td>" + appointment.time_date + "</td>"
-                                                                    + "<td>" + appointment.description + "</td>"
-                                                                    + "<td>" + statustext + "</td>"
-                                                                    + "<td>" + appointment.replytext + "</td>"
-                                                                    + "<td>" + button + "</td>"
-                                                                    + "</tr>";
-                                                                $('#table_appointments tbody').append(row);
-                                                            }
-                                                        } else {
-                                                            alert("获取失败![数据错误]");
-                                                        }
-                                                    }
-                                                });
-
-                                            }
-                                        </script>
-                                    </div>
-                                </div>
+                                    </fieldset>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -161,7 +95,35 @@
                             </tr>
                             </thead>
                             <tbody>
-
+                            {% for appointment in appointments %}
+                                <tr>
+                                    <td>{{ appointment.men_name }}</td>
+                                    <td>{{ appointment.time_date }}</td>
+                                    <td>{{ appointment.description }}</td>
+                                    <td>
+                                        {% if appointment.status == 0 %}
+                                            <span style="color: blue">未审核</span>
+                                        {% elif appointment.status == 1 %}
+                                            <span style="color: green">通过</span>
+                                        {% elif appointment.status == 2 %}
+                                            <span style="color: red">未通过</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ appointment.replytext }}</td>
+                                    <td>
+                                        {% if appointment.status == 0 %}
+                                            <a href="/appointment/{{ appointment.id }}/view"
+                                               class="btn btn-primary btn-sm">查看/撤销</a>
+                                        {% elif appointment.status == 1 %}
+                                            <a href="/appointment/{{ appointment.id }}/view"
+                                               class="btn btn-default btn-sm">查看/评价</a>
+                                        {% elif appointment.status == 2 %}
+                                            <a href="/appointment/{{ appointment.id }}/view"
+                                               class="btn btn-default btn-sm">查看</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
                             </tbody>
                         </table>
                     </div>

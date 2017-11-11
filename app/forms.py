@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.fields import StringField, PasswordField, BooleanField, IntegerField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, NumberRange, Regexp
-
+from app.uploadsets import *
 
 class LoginForm(FlaskForm):
     id = StringField(
@@ -259,3 +259,19 @@ class AdminMentorQueryForm(FlaskForm):
     id = StringField('id')
     name = StringField('name')
     department = StringField('department')
+
+
+class TagNewForm(FlaskForm):
+    tag1id = StringField('tag1id')
+    tag1name = StringField('tag1name')
+    tag2id = StringField('tag2id')
+    tag2name = StringField('tag2name')
+
+class MentorXLSForm(FlaskForm):
+    file = FileField(
+        'file',
+        validators=[
+            FileAllowed(xls, u'暂不支持该类型文件上传'),
+            FileRequired(u'请选择文件')
+        ]
+    )

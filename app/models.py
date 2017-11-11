@@ -70,6 +70,10 @@ class Tag(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
 
 class User2Tag(db.Model):
     __tablename__ = 'User2Tag'
@@ -85,6 +89,10 @@ class User2Tag(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
 
 class MentorAvailableTime(db.Model):
     __tablename__ = 'MentorAvailableTime'
@@ -97,6 +105,10 @@ class MentorAvailableTime(db.Model):
         self.men_id = men_id
         self.weekday = weekday
         self.time = time
+
+    def update(self):
+        db.session.add(self)
+        db.session.commit()
 
 
 class Review(db.Model):
@@ -375,35 +387,25 @@ class User(db.Model):
 
     def getDepartmentString(self):
         return department_id2name[self.department]
-    
-    '''
+
     def getTagString(self):
-        tagids = User2Tag.query.filter(User2Tag.men_id==self.id).all()
-        print tagids
+        uts = User2Tag.query.filter(User2Tag.men_id == self.id).all()
         tags = []
-        for tagid in tagids:
-            tags.append(User2Tag.query.filter(User2Tag.tag_id==tagid).first())
+        for ut in uts:
+            tags.append(Tag.query.filter(Tag.id == ut.tag_id).first())
         s = ''
         for tag in tags:
-            s += '[%s]%s,' % (tag.tag1name,tag.tag2name)
-        print s
+            s += '[%s]%s,' % (tag.tag1name, tag.tag2name)
         return s
-    '''
-
-    def getTagString(self):
-        tags = re.findall(ur'(?<=#)[^#]+?(?=#)', self.tag2)
-        s = ''
-        for t2 in tags:
-            t1 = tag2totag1[t2]
-            s += '[%s]%s,' % (tag1toname[t1], tag2toname[t2])
-        return s
-
 
     def isMen(self):
         return True if self.identify == User.IDENTIFY_MENTOR else False
 
     def isStu(self):
         return True if self.identify == User.IDENTIFY_STUDENT else False
+
+    def isAdmin(self):
+        return True if self.identify == User.IDENTIFY_ADMIN else False
 
     def getHTMLDescription(self):
         description = self.description.replace('\n', '<br />')
@@ -444,3 +446,27 @@ class User(db.Model):
 
     def get_id(self):
         return unicode(self.id)
+
+
+# DYNAMIC
+
+def getOptions_tag1():
+    s = u'<option value="ALL" selected="selected">全部</option>'
+    tag_set = set()
+    tags = Tag.query.all()
+    for tag in tags:
+        tag_set.add((tag.tag1id, tag.tag1name))
+    for tag in tag_set:
+        s += u'<option value="%s">%s</option>' % (tag[0], tag[1])
+    return s
+
+
+def getOptions_tag2():
+    s = u'<option value="ALL" selected="selected">全部</option>'
+    tag_set = set()
+    tags = Tag.query.all()
+    for tag in tags:
+        tag_set.add((tag.tag2id, tag.tag2name))
+    for tag in tag_set:
+        s += u'<option value="%s">%s</option>' % (tag[0], tag[1])
+    return s

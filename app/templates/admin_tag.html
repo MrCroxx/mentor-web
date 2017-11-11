@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% from 'macros.html' import department_options,tag1_options,tag2_options %}
+
+{% block head %}
+    <title>导师有约管理系统 —— 标签查询</title>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2>标签查询</h2>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#newTag">添加标签</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <table id="table_mentors" class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th class="col-md-2">大类ID</th>
+                                <th class="col-md-2">大类名称</th>
+                                <th class="col-md-2">小类ID</th>
+                                <th class="col-md-2">小类名称</th>
+                                <th class="col-md-3">操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for tag in tags %}
+                                <tr>
+                                    <td>{{ tag.tag1id }}</td>
+                                    <td>{{ tag.tag1name }}</td>
+                                    <td>{{ tag.tag2id }}</td>
+                                    <td>{{ tag.tag2name }}</td>
+                                    <td>
+                                        <a href="/admin/tag/{{ tag.id }}/delete" class="btn btn-danger btn-sm">删除</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+
+        <!-- 模态框（Modal） -->
+        <div class="modal fade" id="newTag" tabindex="-1" role="dialog" aria-labelledby="newTagLabel"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="newTagLabel">添加标签</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" method="post">
+                            <fieldset>
+                                {{ form.hidden_tag() }}
+
+                                <div class="form-group">
+                                    <label for="tag1id" class="col-md-3 control-label">大类ID</label>
+                                    <div class="col-md-6">
+                                        {{ form.tag1id(class="form-control") }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="tag1id" class="col-md-3 control-label">大类名称</label>
+                                    <div class="col-md-6">
+                                        {{ form.tag1name(class="form-control") }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="tag1id" class="col-md-3 control-label">小类ID</label>
+                                    <div class="col-md-6">
+                                        {{ form.tag2id(class="form-control") }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="tag1id" class="col-md-3 control-label">小类名称</label>
+                                    <div class="col-md-6">
+                                        {{ form.tag2name(class="form-control") }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-6 col-md-offset-3">
+                                        <button type="submit" class="btn btn-primary">添加</button>
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
