@@ -433,6 +433,19 @@ class User(db.Model):
         else:
             return 0
 
+    def getTagOptions(self):
+        l = []
+        tagids = []
+        uts = User2Tag.query.filter(User2Tag.men_id == self.id).all()
+        for ut in uts:
+            tag = Tag.query.filter(Tag.id == ut.tag_id).first()
+            tagids.append(tag.id)
+        tags = Tag.query.order_by(Tag.tag1id, Tag.tag2id).all()
+        for tag in tags:
+            l.append('<input type="checkbox" name="tags" value="%s" %s/>[%s]%s' % (
+                tag.id, "checked" if tag.id in tagids else "", tag.tag1name, tag.tag2name))
+        return l
+
     # for flask-login
 
     def is_authenticated(self):

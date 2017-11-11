@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% from 'macros.html' import department_options %}
+
+{% block head %}
+    <title>导师有约 —— 导师信息</title>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2>导师信息</h2>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="panel-title">导师信息</div>
+                            </div>
+
+                            <div class="panel-body">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <img src="/static/res/user/{{ user.id }}/pic.jpg"
+                                                 style="width: 100%;height: auto">
+                                        </div>
+                                        <div class="col-md-8">
+                                            <h3>
+                                                <strong>{{ user.name }}</strong>[{{ user.getDepartmentString() }},{{ user.title }}]
+                                            </h3>
+                                            <h4>{{ user.getTagString() }}</h4>
+                                            <p>
+                                            <div class="btn btn-primary" data-toggle="modal"
+                                                 data-target="#update-tag" style="width: 100%">
+                                                <span class="glyphicon glyphicon-upload"></span>修改标签
+                                            </div>
+                                            </p>
+                                            <p>
+                                                {{ user.getHTMLDescription()|safe }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="update-tag" tabindex="-1" role="dialog"
+         aria-labelledby="update-tag-label"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="update-tag-label">
+                        修改标签
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="/admin/user/{{ user.id }}/tag/update" enctype="multipart/form-data">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                {{ tagform.hidden_tag() }}
+                                <div class="row">
+                                    {% for option in user.getTagOptions() %}
+                                        <div class="col-md-6">
+                                            {{ option|safe }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+
+                            <div class="col-md-12">
+
+                                <button type="submit" class="btn btn-primary pull-right">
+                                    确定
+                                </button>
+                                <button class="btn btn-default pull-right" data-dismiss="modal">
+                                    取消
+                                </button>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+
+
+
+
+{% endblock %}

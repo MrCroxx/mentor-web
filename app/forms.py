@@ -2,9 +2,10 @@
 
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
-from wtforms.fields import StringField, PasswordField, BooleanField, IntegerField
+from wtforms.fields import StringField, PasswordField, BooleanField, IntegerField, SelectMultipleField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, NumberRange, Regexp
 from app.uploadsets import *
+
 
 class LoginForm(FlaskForm):
     id = StringField(
@@ -267,6 +268,7 @@ class TagNewForm(FlaskForm):
     tag2id = StringField('tag2id')
     tag2name = StringField('tag2name')
 
+
 class MentorXLSForm(FlaskForm):
     file = FileField(
         'file',
@@ -275,3 +277,7 @@ class MentorXLSForm(FlaskForm):
             FileRequired(u'请选择文件')
         ]
     )
+
+
+class MentorTagUpdateForm(FlaskForm):
+    pass

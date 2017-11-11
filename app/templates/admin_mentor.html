@@ -70,7 +70,6 @@
                             <div class="btn btn-primary" data-toggle="modal"
                                  data-target="#upload-modal" style="width: 100%">
                                 <span class="glyphicon glyphicon-upload"></span> 导入导师信息
-                                <br>
                             </div>
                         </div>
                     </div>
@@ -90,7 +89,7 @@
                                 <tbody>
                                 {% for men in mens %}
                                     <tr>
-                                        <td><a href="/user/{{ men.id }}">{{ men.id }}</a></td>
+                                        <td><a href="/admin/user/{{ men.id }}">{{ men.id }}</a></td>
                                         <td>{{ men.name }}</td>
                                         <td>{{ men.getDepartmentString() }}</td>
                                         <td>{{ men.getAppointmentCount() }}</td>

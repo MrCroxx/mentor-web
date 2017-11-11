@@ -626,7 +626,8 @@ def admin_tag_delete(tagid):
         tag.delete()
     return redirect(url_for('admin_tag'))
 
-@app.route('/admin/mentor/upload/xls',methods=['POST'])
+
+@app.route('/admin/mentor/upload/xls', methods=['POST'])
 @login_required
 def admin_mentor_upload_xls():
     user = current_user
@@ -638,12 +639,50 @@ def admin_mentor_upload_xls():
         file = form.file.data
         file.filename = 'mentor-%s.xls' % (datetime.now().strftime("%Y-%m-%d-%H:%M:%S"))
         realname = xls.save(file)
-        flag,err = mentor_xls_import('app/static/tmp/xls/'+realname)
+        flag, err = mentor_xls_import('app/static/tmp/xls/' + realname)
         if flag:
             flash(u'S导入成功!')
         else:
             flash(u'D%s' % err)
     return redirect(url_for('admin_mentor'))
+
+
+@app.route('/admin/user/<uid>')
+@login_required
+def admin_userinfo(uid):
+    user = current_user
+    if user.identify != User.IDENTIFY_ADMIN:
+        abort(403)
+    u = User.query.filter(User.id == uid).first()
+    if u is None:
+        abort(404)
+    tagform = MentorTagUpdateForm()
+    return render_template('admin_userinfo.html', user=u, tagform=tagform)
+
+
+@app.route('/admin/user/<uid>/tag/update', methods=['POST'])
+@login_required
+def admin_user_tag_update(uid):
+    user = current_user
+    if user.identify != User.IDENTIFY_ADMIN:
+        abort(403)
+    u = User.query.filter(User.id == uid).first()
+    if u is None:
+        abort(404)
+
+    form = MentorTagUpdateForm()
+    if form.validate_on_submit():
+        tagids = request.form.getlist('tags')
+        uts = User2Tag.query.filter(User2Tag.men_id == u.id).all()
+        for ut in uts:
+            ut.delete()
+        for tagid in tagids:
+            tag = Tag.query.filter(Tag.id == tagid).first()
+            if tag is not None:
+                ut = User2Tag(u.id, tag.id)
+                ut.update()
+        flash(u'S修改成功!')
+    return redirect(url_for('admin_userinfo', uid=uid))
 
 
 # ajax routes
