@@ -89,7 +89,7 @@
                                 <tbody>
                                 {% for men in mens %}
                                     <tr>
-                                        <td>{{ men.id }}</td>
+                                        <td><a href="/user/{{ men.id }}">{{ men.id }}</a></td>
                                         <td>{{ men.name }}</td>
                                         <td>{{ men.getDepartmentString() }}</td>
                                         <td>{{ men.getAppointmentCount() }}</td>

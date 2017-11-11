@@ -639,7 +639,10 @@ def admin_mentor_upload_xls():
         file.filename = 'mentor-%s.xls' % (datetime.now().strftime("%Y-%m-%d-%H:%M:%S"))
         realname = xls.save(file)
         flag,err = mentor_xls_import('app/static/tmp/xls/'+realname)
-        print flag,err
+        if flag:
+            flash(u'S导入成功!')
+        else:
+            flash(u'D%s' % err)
     return redirect(url_for('admin_mentor'))
 
 
