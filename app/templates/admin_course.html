@@ -2,7 +2,7 @@
 {% from 'macros.html' import department_all_options %}
 
 {% block head %}
-    <title>导师有约 —— 我的团体课</title>
+    <title>导师有约 —— 团体课管理</title>
     <link href="/static/lib/css/datepicker.min.css" rel="stylesheet">
     <script src="/static/lib/js/datepicker.min.js"></script>
     <script src="/static/lib/js/datepicker.zh-CN.js"></script>
@@ -15,7 +15,7 @@
             <div class="col-md-12">
                 <div class="row">
                     <div class="col-md-12">
-                        <h2>查看团体课</h2>
+                        <h2>团体课管理</h2>
                     </div>
                 </div>
 
@@ -33,6 +33,14 @@
                                         {{ form.hidden_tag() }}
 
                                         <div class="form-group">
+                                            <label for="department" class="col-md-3 control-label">学院/部门</label>
+                                            <div class="col-md-6">
+                                                <select id="department" name="department" class="form-control">
+                                                    {{ department_all_options() }}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
                                             <label for="time_date_string" class="col-md-3 control-label">日期</label>
                                             <div class="col-md-6">
                                                 <input id="use_date" name="use_date" type="checkbox">使用日期筛选
@@ -48,7 +56,17 @@
                                                 </script>
                                             </div>
                                         </div>
-
+                                        <div class="form-group">
+                                            <label for="department" class="col-md-3 control-label">状态</label>
+                                            <div class="col-md-6">
+                                                <select id="status" name="status" class="form-control">
+                                                    <option value="-1">全部</option>
+                                                    <option value="0">未审核</option>
+                                                    <option value="1">通过</option>
+                                                    <option value="2">未通过</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                         <div class="form-group">
                                             <div class="col-md-12">
                                                 <button type="submit" class="btn btn-primary" style="width: 100%">搜索
@@ -72,11 +90,13 @@
                             <tr>
                                 <th class="col-md-1">团体课名</th>
                                 <th class="col-md-1">主讲人</th>
-                                <th class="col-md-3">课程描述</th>
+                                <th class="col-md-2">课程描述</th>
                                 <th class="col-md-1">课程地点</th>
                                 <th class="col-md-2">开始时间</th>
                                 <th class="col-md-2">结束时间</th>
-                                <th class="col-md-2">已选/容量</th>
+                                <th class="col-md-1">已选/容量</th>
+                                <th class="col-md-1">状态</th>
+                                <th class="col-md-1">操作</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -91,16 +111,31 @@
                                     <td>{{ course.time_start }}</td>
                                     <td>{{ course.time_end }}</td>
                                     <td>{{ course.signednum }}/{{ course.capacity }}</td>
+                                    <td>
+                                        {% if course.status == 0 %}
+                                            <span style="color: blue">未审核</span>
+                                        {% elif course.status == 1 %}
+                                            <span style="color: green">通过</span>
+                                        {% elif course.status == 2 %}
+                                            <span style="color: red">未通过</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="/admin/course/{{ course.id }}/exa"
+                                           class="btn btn-primary btn-sm">审批/查看</a>
+                                    </td>
                                 </tr>
                             {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
+
+
             </div>
         </div>
     </div>
 
 
-{% endblock %}
 
+{% endblock %}

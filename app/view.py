@@ -220,7 +220,6 @@ def appointment():
         # if tag2 != 'ALL':
         #    mentors = mentors.filter(User.tag2.ilike('%' + tag2 + '%'))
         mentors = mentors.all()
-        print len(mentors)
         if tag1 != 'ALL':
             mens_tmp = []
             for mentor in mentors:
@@ -234,7 +233,6 @@ def appointment():
                 if flag:
                     mens_tmp.append(mentor)
             mentors = mens_tmp
-        print len(mentors)
         if tag2 != 'ALL':
             mens_tmp = []
             for mentor in mentors:
@@ -248,7 +246,6 @@ def appointment():
                 if flag:
                     mens_tmp.append(mentor)
             mentors = mens_tmp
-        print len(mentors)
         mentors_dict = [mentor.toDict() for mentor in mentors]
     return render_template('appointment.html', mens=mentors_dict, form=form)
 
@@ -297,7 +294,6 @@ def appointment_new(men_id):
                 else:
                     flag = False
                     for time in times:
-                        # print time.weekday, time_time.weekday() + 1, time.time, time_time.time()
                         if time.weekday == time_time.weekday() + 1 and time.time == time_time.time():
                             if Appointment.query.filter(Appointment.time_time == time_time).filter(
                                             Appointment.status == Appointment.STATUS_PASS).count() == 0:
@@ -404,7 +400,6 @@ def course_new():
         name = form.name.data
         description = form.description.data
         capacity = form.capacity.data
-        location = form.location.data
         time_date_string = form.time_date_string.data
         time_start_h = form.time_start_h.data
         time_start_m = form.time_start_m.data
@@ -418,7 +413,6 @@ def course_new():
 
         if time_start <= time_end:
             course = Course(name, user, capacity, description, time_start, time_end)
-            course.location = location
             course.update()
             flash(u'S创建成功!')
             return redirect(url_for('index'))
@@ -428,21 +422,32 @@ def course_new():
     return render_template('course_new.html', form=form)
 
 
-@app.route('/course', methods=['GET'])
+@app.route('/course', methods=['GET', 'POST'])
 @login_required
 def course():
-    if current_user.identify == User.IDENTIFY_MENTOR:
+    if current_user.identify != User.IDENTIFY_STUDENT:
         abort(403)
-    return render_template('course.html')
+    form = CourseQueryForm()
+    courses = []
+    if form.validate_on_submit():
+        user = User.query.filter(User.id == current_user.id).first()
+        form.status.data = Course.STATUS_PASS
+        courses = QueryCourse(form, user)
+    return render_template('course.html', form=form, courses=courses)
 
 
 @app.route('/course/men', methods=['GET'])
 @login_required
 def course_men():
-    if current_user.identify == User.IDENTIFY_STUDENT:
+    if current_user.identify != User.IDENTIFY_MENTOR:
         abort(403)
-    # courses = Course.query.filter(Course.time_start > datetime.now()).order_by(Course.time_start).all()
-    return render_template('course_men.html')
+    form = CourseQueryForm()
+    courses = []
+    if form.validate_on_submit():
+        user = User.query.filter(User.id == current_user.id).first()
+        form.mine.data = True
+        courses = QueryCourse(form, user)
+    return render_template('course_men.html', form=form, courses=courses)
 
 
 @app.route('/course/<cid>/sign', methods=['GET'])
@@ -800,6 +805,20 @@ def admin_user_info_update(uid):
     return redirect(url_for('admin_userinfo', uid=uid))
 
 
+@app.route('/admin/course', methods=['GET', 'POST'])
+@login_required
+def admin_course():
+    if current_user.identify != User.IDENTIFY_ADMIN:
+        abort(403)
+    form = CourseQueryForm()
+    courses = []
+    if form.validate_on_submit():
+        user = User.query.filter(User.id == current_user.id).first()
+        form.mine.data = False
+        courses = QueryCourse(form, user)
+    return render_template('admin_course.html', form=form, courses=courses)
+
+
 # ajax routes
 
 @app.route('/ajax/getIdentifyingcode', methods=['POST'])
@@ -808,98 +827,6 @@ def getIdentifyingcode():
     session['code_text'] = code_text
     code_uri = '/static/tmp/code/' + getSHA256(code_text)
     return jsonify({'code_uri': code_uri})
-
-
-'''
-@app.route('/ajax/mentor/query', methods=['POST'])
-@login_required
-def ajax_mentor_query():
-    user = current_user
-    if user.identify == User.IDENTIFY_MENTOR:
-        abort(403)
-
-    form = MentorQueryForm()
-    if form.validate_on_submit():
-        department = form.department.data
-        tag1 = form.tag1.data
-        tag2 = form.tag2.data
-        mentors = User.query.filter(User.identify == User.IDENTIFY_MENTOR)
-        if department != 'ALL':
-            mentors = mentors.filter(User.department == department)
-        # if tag1 != 'ALL':
-        #    mentors = mentors.filter(User.tag1.ilike('%' + tag1 + '%'))
-        # if tag2 != 'ALL':
-        #    mentors = mentors.filter(User.tag2.ilike('%' + tag2 + '%'))
-        mentors = mentors.all()
-        print len(mentors)
-        if tag1 != 'ALL':
-            mens_tmp = []
-            for mentor in mentors:
-                uts = User2Tag.query.filter(User2Tag.men_id == mentor.id).all()
-                flag = False
-                for ut in uts:
-                    tag = Tag.query.filter(Tag.id == ut.tag_id).first()
-                    if tag.tag1id == tag1:
-                        flag = True
-                        break
-                if flag:
-                    mens_tmp.append(mentor)
-            mentors = mens_tmp
-        print len(mentors)
-        if tag2 != 'ALL':
-            mens_tmp = []
-            for mentor in mentors:
-                uts = User2Tag.query.filter(User2Tag.men_id == mentor.id).all()
-                flag = False
-                for ut in uts:
-                    tag = Tag.query.filter(Tag.id == ut.tag_id).first()
-                    if tag.tag2id == tag2:
-                        flag = True
-                        break
-                if flag:
-                    mens_tmp.append(mentor)
-            mentors = mens_tmp
-        print len(mentors)
-        mentors_dict = [mentor.toDict() for mentor in mentors]
-        return jsonify({'status': SUCCESS, 'content': mentors_dict})
-    else:
-        return jsonify({'status': BAD})
-'''
-
-'''
-@app.route('/ajax/appointment/query', methods=['POST'])
-@login_required
-def ajax_appointment_query():
-    user = current_user
-    identify = user.identify
-    form = AppointmentQueryForm()
-    if form.validate_on_submit():
-        if identify == User.IDENTIFY_MENTOR:
-            appointments = Appointment.query.filter(Appointment.men_id == user.id)
-        else:
-            appointments = Appointment.query.filter(Appointment.stu_id == user.id)
-        status = form.status.data
-        department = form.department.data
-        use_date = form.use_date.data
-        if use_date:
-            time_date_string = form.time_date_string.data
-            match = re.search(r'(\d+)-(\d+)-(\d+)', time_date_string)
-            y, m, d = int(match.group(1)), int(match.group(2)), int(match.group(3))
-            time_date = date(y, m, d)
-            appointments = appointments.filter(Appointment.time_date == time_date)
-        if status != 'ALL':
-            appointments = appointments.filter(Appointment.status == status)
-        if department != 'ALL':
-            if user.identify == User.IDENTIFY_MENTOR:
-                appointments = appointments.join(User.appointments_stu).filter(User.department == department)
-            elif user.identify == User.IDENTIFY_STUDENT:
-                appointments = appointments.join(User.appointments_men).filter(User.department == department)
-        appointments = appointments.order_by(desc(Appointment.time_date)).all()
-        appointments_dict = [appointment.toDict() for appointment in appointments]
-        return jsonify({'status': SUCCESS, 'content': appointments_dict})
-    else:
-        return jsonify({'status': BAD})
-'''
 
 
 @app.route('/ajax/appointment/<aid>/score', methods=['POST'])
@@ -923,6 +850,7 @@ def ajax_appointment_score(aid):
         return jsonify({'status': BAD})
 
 
+'''
 @app.route('/ajax/course/query/<type>', methods=['POST'])
 @login_required
 def ajax_course_query(type):
@@ -979,6 +907,7 @@ def ajax_course_query(type):
         return jsonify({'status': SUCCESS, 'content': courses_dict})
     else:
         abort(403)
+'''
 
 
 # Query Functions
@@ -1007,6 +936,47 @@ def queryAppointment(form, user):
     appointments = appointments.order_by(desc(Appointment.time_date)).all()
     appointments_dict = [appointment.toDict() for appointment in appointments]
     return appointments_dict
+
+
+def QueryCourse(form, user):
+    department = form.department.data
+    time_date_string = form.time_date_string.data
+    use_date = form.use_date.data
+    mine = form.mine.data
+    status = form.status.data
+
+    if user.identify == User.IDENTIFY_STUDENT:
+        courses = Course.query.filter(Course.status == Course.STATUS_PASS)
+    else:
+        courses = Course.query
+
+    if mine:
+        if user.identify == User.IDENTIFY_STUDENT:
+            courses = user.courses_stu
+        elif user.identify == User.IDENTIFY_MENTOR:
+            courses = courses.filter(Course.men_id == user.id)
+
+    if status != -1:
+        courses = courses.filter(Course.status == status)
+
+    if use_date:
+        match = re.search(r'(\d+)-(\d+)-(\d+)', time_date_string)
+        if match is not None:
+            y, m, d = int(match.group(1)), int(match.group(2)), int(match.group(3))
+            datetime_query_min = datetime(y, m, d)
+            datetime_query_max = datetime_query_min + timedelta(days=1)
+            courses = courses.filter(Course.time_start >= datetime_query_min).filter(
+                Course.time_start <= datetime_query_max)
+
+    if department != 'ALL':
+        courses = courses.join(User.courses_men).filter(User.department == department)
+
+    courses = courses.order_by(Course.time_start).all()
+    if user.identify == User.IDENTIFY_STUDENT:
+        courses_dict = [course.toDict(user) for course in courses]
+    else:
+        courses_dict = [course.toDict() for course in courses]
+    return courses_dict
 
 
 # Generate XLS

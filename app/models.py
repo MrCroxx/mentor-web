@@ -243,6 +243,7 @@ class Course(db.Model):
     time_start = db.Column(db.DateTime)  # 课程开始时间
     time_end = db.Column(db.DateTime)  # 课程结束时间
     time_submit = db.Column(db.DateTime)
+    replytext = db.collate(db.String)
     status = db.Column(db.Integer)
 
     STATUS_WAITING = 0
@@ -311,7 +312,8 @@ class Course(db.Model):
             'time_start': self.time_start.strftime('%Y-%m-%d %H:%M:%S'),
             'time_end': self.time_end.strftime('%Y-%m-%d %H:%M:%S'),
             'time_sumbit': self.time_submit.strftime('%Y-%m-%d %H:%M:%S'),
-            'status': 0 if user is None else (1 if self.isSigned(user) else 0),
+            'signstatus': 0 if user is None else (1 if self.isSigned(user) else 0),
+            'status': self.status,
         }
 
 

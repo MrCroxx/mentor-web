@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from 'macros.html' import department_options %}
+{% from 'macros.html' import department_all_options %}
 
 {% block head %}
     <title>导师有约 —— 查看团体课</title>
@@ -25,132 +25,55 @@
                             <div class="panel-heading">
                                 <div class="panel-title">团体课检索</div>
                             </div>
-
                             <div class="panel-body">
-                                <div class="panel-body">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <h4>检索方式</h4>
-                                            <select id="type" name="type" class="form-control">
-                                                <option value="0" selected="selected">全部团体课</option>
-                                                <option value="1">按学院检索</option>
-                                                <option value="2">按日期检索</option>
-                                                <option value="3">已选课程</option>
-                                            </select>
-                                            <script language="javascript">
-                                                $(document).ready(function () {
-                                                    $('#type_department').hide();
-                                                    $('#type_time_date').hide();
-                                                    $("#type").change(function () {
-                                                        switch ($("#type").val()) {
-                                                            case "0":
-                                                                $('#type_department').hide();
-                                                                $('#type_time_date').hide();
-                                                                break;
-                                                            case "1":
-                                                                $('#type_department').show();
-                                                                $('#type_time_date').hide();
-                                                                break;
-                                                                break;
-                                                            case "2":
-                                                                $('#type_department').hide();
-                                                                $('#type_time_date').show();
-                                                                break;
-                                                            case "3":
-                                                                $('#type_department').hide();
-                                                                $('#type_time_date').hide();
-                                                                break;
-                                                        }
+
+                                <form class="form-horizontal" method="post">
+                                    <fieldset>
+                                        <legend>条件检索</legend>
+                                        {{ form.hidden_tag() }}
+
+                                        <div class="form-group">
+                                            <label for="department" class="col-md-3 control-label">学院/部门</label>
+                                            <div class="col-md-6">
+                                                <select id="department" name="department" class="form-control">
+                                                    {{ department_all_options() }}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="time_date_string" class="col-md-3 control-label">日期</label>
+                                            <div class="col-md-6">
+                                                <input id="use_date" name="use_date" type="checkbox">使用日期筛选
+                                                <input id="time_date_string" name="time_date_string" type="text"
+                                                       class="form-control"><br/>
+                                                <script type="text/javascript">
+                                                    $("#time_date_string").datepicker({
+                                                        autoPick: true,
+                                                        autoHide: true,
+                                                        format: "yyyy-mm-dd",
+                                                        language: 'zh-CN'
                                                     });
-                                                });
-                                            </script>
+                                                </script>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div id="type_department" class="row">
-                                        <div class="col-md-12">
-                                            <h4>学院</h4>
-                                            <select id="department" name="department" class="form-control">
-                                                {{ department_options() }}
-                                            </select>
+                                        <div class="form-group">
+                                            <label for="mine" class="col-md-3 control-label">已选课程</label>
+                                            <div class="col-md-6">
+                                                <input id="mine" name="mine" type="checkbox">只看已选课程
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div id="type_time_date" class="row">
-                                        <div class="col-md-12">
-                                            <h4>日期</h4>
-                                            <input id="time_date_string" name="time_date_string" type="text"
-                                                   class="form-control"><br/>
+                                        <div class="form-group">
+                                            <div class="col-md-12">
+                                                <button type="submit" class="btn btn-primary" style="width: 100%">搜索
+                                                </button>
+                                            </div>
+                                        </div>
 
-                                            <script type="text/javascript">
-                                                $("#time_date_string").datepicker({
-                                                    autoHide: true,
-                                                    format: "yyyy-mm-dd",
-                                                    language: 'zh-CN'
-                                                });
-                                            </script>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div id='query' onclick="ajax_query()" class="btn btn-primary"
-                                             style="width: 100%">搜索
-                                        </div>
-                                        <script>
-                                            var csrftoken = "{{ csrf_token()|safe }}";
 
-                                            function ajax_query() {
-                                                url = "/ajax/course/query/" + $("#type").val();
-                                                data = "";
-                                                data += "&department=" + $("#department").val();
-                                                data += "&time_date_string=" + $("#time_date_string").val();
-                                                $.ajax({
-                                                    type: "POST",
-                                                    url: url,
-                                                    data: data,
-                                                    dataType: 'json',
-                                                    async: false,
-                                                    beforeSend: function (xhr, settings) {
-                                                        xhr.setRequestHeader("X-CSRFToken", csrftoken)
-                                                    },
-                                                    error: function (request) {
-                                                        alert("获取失败![网络错误]");
-                                                    },
-                                                    success: function (data) {
-                                                        if (data.status == 20000) {
-                                                            $('#table_courses tbody').empty();
-                                                            courses = data.content;
-                                                            for (i = 0; i < courses.length; i++) {
-                                                                course = courses[i];
-                                                                button = "";
-                                                                if (course.status == 0) {
-                                                                    button = "<a href=\"/course/" + course.id + "/sign\" class=\"btn btn-primary btn-sm\">选课</a>";
-                                                                } else if (course.status == 1) {
-                                                                    button = "<a href=\"/course/" + course.id + "/unsign\" class=\"btn btn-danger btn-sm\">退选</a>"
-                                                                }
-                                                                var row = "<tr>"
-                                                                    + "<td>" + course.name + "</td>"
-                                                                    + "<td>" + course.men_name + "</td>"
-                                                                    + "<td>" + course.description + "</td>"
-                                                                    + "<td>" + course.location + "</td>"
-                                                                    + "<td>" + course.time_start + "</td>"
-                                                                    + "<td>" + course.time_end + "</td>"
-                                                                    + "<td>" + course.signednum + "/" + course.capacity + "</td>"
-                                                                    + "<td>" + button + "</td>"
-                                                                    + "</tr>";
-                                                                $('#table_courses tbody').append(row);
-                                                            }
-                                                        } else {
-                                                            alert("获取失败![数据错误]");
-                                                        }
-                                                    }
-                                                });
-                                            }
-                                        </script>
-                                    </div>
-                                </div>
+                                    </fieldset>
+
+                                </form>
                             </div>
-
-
                         </div>
                     </div>
                 </div>
@@ -172,6 +95,26 @@
                             </thead>
                             <tbody>
 
+
+                            {% for course in courses %}
+                                <tr>
+                                    <td>{{ course.name }}</td>
+                                    <td>{{ course.men_name }}</td>
+                                    <td>{{ course.description }}</td>
+                                    <td>{{ course.location }}</td>
+                                    <td>{{ course.time_start }}</td>
+                                    <td>{{ course.time_end }}</td>
+                                    <td>{{ course.signednum }}/{{ course.capacity }}</td>
+                                    <td>
+                                        {% if course.signstatus == 0 %}
+                                            <a href="/course/{{ course.id }}/sign" class="btn btn-primary btn-sm">选课</a>
+                                        {% else %}
+                                            <a href="/course/{{ course.id }}/unsign"
+                                               class="btn btn-danger btn-sm">退选</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
                             </tbody>
                         </table>
                     </div>

@@ -165,12 +165,14 @@ class CourseNewForm(FlaskForm):
     description = StringField(
         'description',
     )
+    '''
     location = StringField(
         'location',
         validators=[
             DataRequired(message=u'请输入课程地点!')
         ]
     )
+    '''
     time_date_string = StringField(
         'time_date_string',
         validators=[
@@ -196,23 +198,12 @@ class CourseNewForm(FlaskForm):
     )
 
 
-class CourseQueryByDepartmentForm(FlaskForm):
-    department = StringField(
-        'department',
-        validators=[
-            DataRequired()
-        ]
-    )
-
-
-class CourseQueryByDateForm(FlaskForm):
-    time_date_string = StringField(
-        'time_date_string',
-        validators=[
-            DataRequired(),
-            Regexp(r'(\d+)-(\d+)-(\d+)')
-        ]
-    )
+class CourseQueryForm(FlaskForm):
+    department = StringField('department')
+    time_date_string = StringField('time_date_string')
+    use_date = BooleanField('use_date')
+    mine = BooleanField('mine')
+    status = IntegerField('status')
 
 
 class ReviewNewForm(FlaskForm):
