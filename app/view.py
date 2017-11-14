@@ -838,8 +838,6 @@ def admin_course_exa(cid):
         course.status = status
         course.update()
         flash(u'S审批成功')
-    else:
-        print 'fuck!!!!!!!!'
     return render_template('admin_course_exa.html', course=course, form=form)
 
 
@@ -872,67 +870,6 @@ def ajax_appointment_score(aid):
             return jsonify({'status': BAD})
     else:
         return jsonify({'status': BAD})
-
-
-'''
-@app.route('/ajax/course/query/<type>', methods=['POST'])
-@login_required
-def ajax_course_query(type):
-    user = current_user
-    type = int(type)
-    courses = []
-    if user.identify == User.IDENTIFY_STUDENT:
-        if type == 0:
-            courses = Course.query.filter(datetime.now() < Course.time_start).order_by(Course.time_start).all()
-        elif type == 1:
-            form = CourseQueryByDepartmentForm()
-            if form.validate_on_submit():
-                department = form.department.data
-                courses = Course.query.join(User.courses_men).filter(User.department == department).order_by(
-                    Course.time_start).all()
-            else:
-                return jsonify({'status': BAD})
-        elif type == 2:
-            form = CourseQueryByDateForm()
-            if form.validate_on_submit():
-                time_date_string = form.time_date_string.data
-                match = re.search(r'(\d+)-(\d+)-(\d+)', time_date_string)
-                y, m, d = int(match.group(1)), int(match.group(2)), int(match.group(3))
-                datetime_query_min = datetime(y, m, d)
-                datetime_query_max = datetime_query_min + timedelta(days=1)
-                courses = Course.query.filter(Course.time_start > datetime_query_min).filter(
-                    Course.time_start < datetime_query_max).order_by(Course.time_start).all()
-            else:
-                return jsonify({'status': BAD})
-        elif type == 3:
-            user = User.query.filter(User.id == user.id).first()
-            courses = user.courses_stu.order_by(desc(Course.time_start)).all()
-        user = User.query.filter(User.id == user.id).first()
-        courses_dict = [course.toDict(user) for course in courses]
-        return jsonify({'status': SUCCESS, 'content': courses_dict})
-    elif user.identify == User.IDENTIFY_MENTOR:
-        user = User.query.filter(User.id == user.id).first()
-        if type == 0:
-            courses = Course.query.filter(Course.men_id == user.id).order_by(Course.time_start).all()
-        elif type == 2:
-            form = CourseQueryByDateForm()
-            if form.validate_on_submit():
-                time_date_string = form.time_date_string.data
-                match = re.search(r'(\d+)-(\d+)-(\d+)', time_date_string)
-                y, m, d = int(match.group(1)), int(match.group(2)), int(match.group(3))
-                datetime_query_min = datetime(y, m, d)
-                datetime_query_max = datetime_query_min + timedelta(days=1)
-                courses = Course.query.filter(Course.time_start > datetime_query_min).filter(
-                    Course.time_start < datetime_query_max).filter(Course.men_id == user.id).order_by(
-                    Course.time_start).all()
-            else:
-                return jsonify({'status': BAD})
-        courses_dict = [course.toDict() for course in courses]
-        return jsonify({'status': SUCCESS, 'content': courses_dict})
-    else:
-        abort(403)
-'''
-
 
 # Query Functions
 

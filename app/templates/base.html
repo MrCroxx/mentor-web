@@ -66,6 +66,14 @@
                         </a>
                         <ul class="dropdown-menu">
                             <!--li role="separator" class="divider"></li-->
+                            {% if current_user.canAccessData() %}
+                                <li><a href="/data/xls/daily"><span
+                                        class="glyphicon glyphicon-plus"></span>下载今日预约</a></li>
+                                <li><a href="/data/xls/waiting"><span
+                                        class="glyphicon glyphicon-plus"></span>下载未审核预约</a></li>
+                                <li><a href="/data/xls/all"><span
+                                        class="glyphicon glyphicon-plus"></span>下载全部预约</a></li>
+                            {% endif %}
 
                             <li><a href="/logout/lm"><span class="glyphicon glyphicon-log-out"></span>注销</a></li>
                             <!--<li class="dropdown-header">Nav header</li>-->
