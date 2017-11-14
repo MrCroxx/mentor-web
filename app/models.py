@@ -110,6 +110,10 @@ class MentorAvailableTime(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
 
 class Review(db.Model):
     __tablename__ = 'Review'
@@ -407,19 +411,31 @@ class User(db.Model):
     def isAdmin(self):
         return True if self.identify == User.IDENTIFY_ADMIN else False
 
-    def getHTMLDescription(self):
+    def getHTMLDescription(self, admin=False):
         description = self.description.replace('\n', '<br />')
-        description += self.getAvailableTime()
+        if admin:
+            description += u'<div class="btn btn-primary" data-toggle="modal"data-target="#update-info" style="width: 100%">修改基本信息</div>'
+        description += self.getAvailableTime(admin)
         return description
 
-    def getAvailableTime(self):
+    def getAvailableTime(self, admin):
         text = ''
-        times = MentorAvailableTime.query.filter(MentorAvailableTime.men_id == self.id).all()
-        if len(times) == 0:
-            return u'<h3>可预约时间</h3><p>暂无限制</p>'
+        times = MentorAvailableTime.query.filter(
+            MentorAvailableTime.men_id == self.id).order_by(
+            MentorAvailableTime.weekday, MentorAvailableTime.time).all()
+
         text += u'<h3>可预约时间</h3>'
+        if len(times) == 0:
+            text +=  u'<p>暂无限制</p>'
         for time in times:
-            text += u'<p>星期%s %s</p>' % (weekday_int2char[time.weekday], time.time.strftime('%H:%M'))
+            btn = u'' if not admin else u"&nbsp;&nbsp;&nbsp;&nbsp;<a href='/admin/user/%s/avatime/%s/delete' class='btn btn-danger btn-sm'>删除</a>" % (
+            self.id, time.id)
+
+            text += u'<p>星期%s %s%s</p>' % (weekday_int2char[time.weekday], time.time.strftime('%H:%M'), btn)
+
+        if admin:
+            text += u'<div class="btn btn-primary" data-toggle="modal" data-target="#add-avatime">添加可预约时间</div>'
+
         return text
 
     def canAccessData(self):

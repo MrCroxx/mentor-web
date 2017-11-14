@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from 'macros.html' import department_options %}
+{% from 'macros.html' import department_all_options,hour_options,minute_options %}
 
 {% block head %}
     <title>导师有约 —— 导师信息</title>
@@ -37,12 +37,11 @@
                                             <h4>{{ user.getTagString() }}</h4>
                                             <p>
                                             <div class="btn btn-primary" data-toggle="modal"
-                                                 data-target="#update-tag" style="width: 100%">
-                                                <span class="glyphicon glyphicon-upload"></span>修改标签
+                                                 data-target="#update-tag" style="width: 100%">修改标签
                                             </div>
                                             </p>
                                             <p>
-                                                {{ user.getHTMLDescription()|safe }}
+                                                {{ user.getHTMLDescription(True)|safe }}
                                             </p>
                                         </div>
                                     </div>
@@ -103,6 +102,233 @@
         </div><!-- /.modal -->
     </div>
 
+    <div class="modal fade" id="add-avatime" tabindex="-1" role="dialog"
+         aria-labelledby="add-avatime-label"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="add-avatime-label">
+                        添加可预约时间
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="/admin/user/{{ user.id }}/avatime/add" enctype="multipart/form-data">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                {{ avatimeform.hidden_tag() }}
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <h4>星期</h4>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <select id="weekday" name="weekday" class="form-control">
+                                            <option value="1" selected>星期一</option>
+                                            <option value="2">星期二</option>
+                                            <option value="3">星期三</option>
+                                            <option value="4">星期四</option>
+                                            <option value="5">星期五</option>
+                                            <option value="6">星期六</option>
+                                            <option value="7">星期日</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <br>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <h4>时间</h4>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <select id="time_hour" name="time_hour" class="form-control">
+                                            {{ hour_options() }}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-1"><h4>:</h4></div>
+                                    <div class="col-md-4">
+
+                                        <select id="time_minute" name="time_minute" class="form-control">
+                                            {{ minute_options() }}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <br>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+
+                            <div class="col-md-12">
+
+                                <button type="submit" class="btn btn-primary pull-right">
+                                    确定
+                                </button>
+                                <button class="btn btn-default pull-right" data-dismiss="modal">
+                                    取消
+                                </button>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+    <div class="modal fade" id="update-info" tabindex="-1" role="dialog"
+         aria-labelledby="update-info-label"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="update-info-label">
+                        修改基本信息
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="/admin/user/{{ user.id }}/info/update" enctype="multipart/form-data">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                {{ infoform.hidden_tag() }}
+                                <div class="row">
+                                    <div class="col-md-3"><h4>导师姓名</h4></div>
+                                    <div class="col-md-9">
+                                        <input id="name" name="name" class="form-control">
+                                        <br>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3"><h4>学院/书院/机关部处</h4></div>
+                                    <div class="col-md-9">
+                                        <select id="department_id" name="department_id" class="form-control">
+                                            {{ department_all_options()|safe }}
+                                        </select>
+                                        <br>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3"><h4>职称</h4></div>
+                                    <div class="col-md-9">
+                                        <input id="title1" name="title1" class="form-control">
+                                        <br>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3"><h4>行政职务</h4></div>
+                                    <div class="col-md-9">
+                                        <input id="title2" name="title2" class="form-control">
+                                        <br>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3"><h4>学术兼职</h4></div>
+                                    <div class="col-md-9">
+                                        <textarea id="xsjz" name="xsjz" cols="3" class="form-control"></textarea>
+                                        <br>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3"><h4>教育背景</h4></div>
+                                    <div class="col-md-9">
+                                        <textarea id="jybj" name="jybj" cols="3" class="form-control"></textarea>
+                                        <br>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3"><h4>研究方向</h4></div>
+                                    <div class="col-md-9">
+                                        <textarea id="yjfx" name="yjfx" cols="3" class="form-control"></textarea>
+                                        <br>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3"><h4>研究经历</h4></div>
+                                    <div class="col-md-9">
+                                        <textarea id="yjjl" name="yjjl" cols="3" class="form-control"></textarea>
+                                        <br>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3"><h4>研究成果</h4></div>
+                                    <div class="col-md-9">
+                                        <textarea id="yjcg" name="yjcg" cols="3" class="form-control"></textarea>
+                                        <br>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3"><h4>工作经历</h4></div>
+                                    <div class="col-md-9">
+                                        <textarea id="gzjl" name="gzjl" cols="3" class="form-control"></textarea>
+                                        <br>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3"><h4>奖励荣誉</h4></div>
+                                    <div class="col-md-9">
+                                        <textarea id="jlry" name="jlry" cols="3" class="form-control"></textarea>
+                                        <br>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3"><h4>辅导优势及个人特色</h4></div>
+                                    <div class="col-md-9">
+                                        <textarea id="fdys" name="fdys" cols="3" class="form-control"></textarea>
+                                        <br>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3"><h4>送给大学生的一句话</h4></div>
+                                    <div class="col-md-9">
+                                        <textarea id="yjh" name="yjh" cols="3" class="form-control"></textarea>
+                                        <br>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3"><h4>电子邮箱</h4></div>
+                                    <div class="col-md-9">
+                                        <textarea id="email" name="email" cols="3" class="form-control"></textarea>
+                                        <br>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3"><h4>联系电话</h4></div>
+                                    <div class="col-md-9">
+                                        <textarea id="phone" name="phone" cols="3" class="form-control"></textarea>
+                                        <br>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                        <div class="row">
+
+                            <div class="col-md-12">
+
+                                <button type="submit" class="btn btn-primary pull-right">
+                                    确定
+                                </button>
+                                <button class="btn btn-default pull-right" data-dismiss="modal">
+                                    取消
+                                </button>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
 
 
 

@@ -281,3 +281,27 @@ class MentorXLSForm(FlaskForm):
 
 class MentorTagUpdateForm(FlaskForm):
     pass
+
+
+class AvaTimeAddForm(FlaskForm):
+    weekday = IntegerField('weekday')
+    time_hour = IntegerField('time_hour')
+    time_minute = IntegerField('time_minute')
+
+
+class MentorInfoUpdateForm(FlaskForm):
+    name = StringField('name')
+    department_id = StringField('department_id')
+    title1 = StringField('title1')
+    title2 = StringField('title2')
+    xsjz = StringField('xsjz')
+    jybj = StringField('jybj')
+    yjfx = StringField('yjfx')
+    yjjl = StringField('yjjl')
+    yjcg = StringField('yjcg')
+    gzjl = StringField('gzjl')
+    jlry = StringField('jlry')
+    fdys = StringField('fdys')
+    yjh = StringField('yjh')
+    email = StringField('email')
+    phone = StringField('phone')

@@ -89,6 +89,12 @@ def mentor_xls_import(path):
         if row[13] != "":
             description += "<h3>" + u"送给大学生的一句话" + "</h3>"
             description += "<p>" + row[13] + "</p>"
+        if row[14] != "":
+            description += "<h3>" + u"电子邮箱" + "</h3>"
+            description += "<p>" + row[14] + "</p>"
+        if row[15] != "":
+            description += "<h3>" + u"联系电话" + "</h3>"
+            description += "<p>" + row[15] + "</p>"
         description.replace("\n", '<br/>')
 
         user = User.query.filter(User.identify == User.IDENTIFY_MENTOR).filter(User.id == id).first()

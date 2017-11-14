@@ -657,7 +657,9 @@ def admin_userinfo(uid):
     if u is None:
         abort(404)
     tagform = MentorTagUpdateForm()
-    return render_template('admin_userinfo.html', user=u, tagform=tagform)
+    avatimeform = AvaTimeAddForm()
+    infoform = MentorInfoUpdateForm()
+    return render_template('admin_userinfo.html', user=u, tagform=tagform, avatimeform=avatimeform, infoform=infoform)
 
 
 @app.route('/admin/user/<uid>/tag/update', methods=['POST'])
@@ -682,6 +684,120 @@ def admin_user_tag_update(uid):
                 ut = User2Tag(u.id, tag.id)
                 ut.update()
         flash(u'S修改成功!')
+    return redirect(url_for('admin_userinfo', uid=uid))
+
+
+@app.route('/admin/user/<uid>/avatime/<tid>/delete', methods=['GET'])
+@login_required
+def admin_avatime_delete(uid, tid):
+    user = current_user
+    if user.identify != User.IDENTIFY_ADMIN:
+        abort(403)
+    avatime = MentorAvailableTime.query.filter(MentorAvailableTime.id == tid).first()
+    if avatime is not None:
+        avatime.delete()
+        flash(u'S删除成功!')
+    else:
+        abort(404)
+    return redirect(url_for('admin_userinfo', uid=uid))
+
+
+@app.route('/admin/user/<uid>/avatime/add', methods=['POST'])
+@login_required
+def admin_avatime_add(uid):
+    user = current_user
+    if user.identify != User.IDENTIFY_ADMIN:
+        abort(403)
+    u = User.query.filter(User.id == uid).first()
+    if u is None:
+        abort(404)
+    form = AvaTimeAddForm()
+    if form.validate_on_submit():
+        weekday = int(form.weekday.data)
+        hour = int(form.time_hour.data)
+        minute = int(form.time_minute.data)
+        t = datetime(1, 1, 1, hour, minute).time()
+        avatime = MentorAvailableTime(u.id, weekday, t)
+        avatime.update()
+        flash(u'S添加成功!')
+    return redirect(url_for('admin_userinfo', uid=uid))
+
+
+@app.route('/admin/user/<uid>/info/update', methods=['POST'])
+@login_required
+def admin_user_info_update(uid):
+    user = current_user
+    if user.identify != User.IDENTIFY_ADMIN:
+        abort(403)
+    u = User.query.filter(User.id == uid).first()
+    if u is None:
+        abort(404)
+    form = MentorInfoUpdateForm()
+    if form.validate_on_submit():
+        name = form.name.data
+        department_id = form.department_id.data
+        title1 = form.title1.data
+        title2 = form.title2.data
+        xsjz = form.xsjz.data
+        jybj = form.jybj.data
+        yjfx = form.yjfx.data
+        yjjl = form.yjjl.data
+        yjcg = form.yjcg.data
+        gzjl = form.gzjl.data
+        jlry = form.jlry.data
+        fdys = form.fdys.data
+        yjh = form.yjh.data
+        email = form.email.data
+        phone = form.phone.data
+
+        if department_id in department_id2name:
+
+            title = title1
+            if title2 != u'':
+                title += title2
+            description = ""
+            if xsjz != "":
+                description += "<h3>" + u"学术兼职" + "</h3>"
+                description += "<p>" + xsjz + "</p>"
+            if jybj != "":
+                description += "<h3>" + u"教育背景" + "</h3>"
+                description += "<p>" + jybj + "</p>"
+            if yjfx != "":
+                description += "<h3>" + u"研究方向" + "</h3>"
+                description += "<p>" + yjfx + "</p>"
+            if yjjl != "":
+                description += "<h3>" + u"研究经历" + "</h3>"
+                description += "<p>" + yjjl + "</p>"
+            if yjcg != "":
+                description += "<h3>" + u"研究成果" + "</h3>"
+                description += "<p>" + yjcg + "</p>"
+            if gzjl != "":
+                description += "<h3>" + u"工作经历" + "</h3>"
+                description += "<p>" + gzjl + "</p>"
+            if jlry != "":
+                description += "<h3>" + u"奖励荣誉" + "</h3>"
+                description += "<p>" + jlry + "</p>"
+            if fdys != "":
+                description += "<h3>" + u"辅导优势及个人特色" + "</h3>"
+                description += "<p>" + fdys + "</p>"
+            if yjh != "":
+                description += "<h3>" + u"送给大学生的一句话" + "</h3>"
+                description += "<p>" + yjh + "</p>"
+            if email != "":
+                description += "<h3>" + u"电子邮箱" + "</h3>"
+                description += "<p>" + email + "</p>"
+            if phone != "":
+                description += "<h3>" + u"联系电话" + "</h3>"
+                description += "<p>" + phone + "</p>"
+            description.replace("\n", '<br/>')
+            u.name = name
+            u.department = department_id
+            u.title = title
+            u.description = description
+            u.update()
+            flash(u'S修改成功!')
+        else:
+            flash(u'D部门代码不正确!')
     return redirect(url_for('admin_userinfo', uid=uid))
 
 
