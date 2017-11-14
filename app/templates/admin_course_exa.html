@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>导师有约 —— 团体课审批</title>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="thumbnail">
+                    <div class="caption">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel-primary">
+                                    <div class="panel-heading">
+                                        <div class="panel-title">团体课信息</div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <p>名称 : {{ course.name }}</p>
+                                                <p>主讲 : {{ course.men.name }}</p>
+                                                <p>描述 : {{ course.description }}</p>
+                                                <p>人数 : {{ course.capacity }}</p>
+                                                <p>开始时间 : {{ course.time_start.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                                                <p>结束时间 : {{ course.time_end.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                                                <p>状态 :
+                                                    {% if course.status == 0 %}
+                                                        <span style="color: blue">未审核</span>
+                                                    {% elif course.status == 1 %}
+                                                        <span style="color: green">通过</span>
+                                                    {% elif course.status == 2 %}
+                                                        <span style="color: red">未通过</span>
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel-primary">
+                                    <div class="panel-heading">
+                                        <div class="panel-title">审批信息</div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                {% if course.status == 0 %}
+                                                    <form id="form-reply" class="form-horizontal" method="post">
+                                                        <fieldset>
+                                                            {{ form.hidden_tag() }}
+                                                            <div class="form-group">
+                                                                <label for="replytext"
+                                                                       class="col-md-3 control-label">通过/未通过原因</label>
+                                                                <div class="col-md-6">
+                                                                    <textarea id="replytext" name="replytext"
+                                                                              class="form-control"
+                                                                              rows="3"></textarea>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="location"
+                                                                       class="col-md-3 control-label">分配地点</label>
+                                                                <div class="col-md-6">
+                                                                    <input id="location" name="location"
+                                                                           class="form-control">
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <div class="col-md-6 col-md-offset-3">
+                                                                    <select id="status" name="status"
+                                                                            class="form-control">
+                                                                        <option value="1" selected>通过</option>
+                                                                        <option value="2">未通过</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <div class="col-md-12">
+                                                                    <button type="submit" class="btn btn-primary"
+                                                                            style="width: 100%">提交
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </fieldset>
+                                                    </form>
+                                                {% else %}
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <h4>通过/未通过原因 : </h4>
+                                                            <p>{{ course.replytext }}</p>
+                                                            <h4>分配地点 : </h4>
+                                                            <p>{{ course.location }}</p>
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

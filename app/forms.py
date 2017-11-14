@@ -206,6 +206,12 @@ class CourseQueryForm(FlaskForm):
     status = IntegerField('status')
 
 
+class CourseExaForm(FlaskForm):
+    replytext = StringField('replytext')
+    location = StringField('location')
+    status = IntegerField('status')
+
+
 class ReviewNewForm(FlaskForm):
     location = StringField(
         'location',

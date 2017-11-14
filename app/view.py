@@ -819,6 +819,30 @@ def admin_course():
     return render_template('admin_course.html', form=form, courses=courses)
 
 
+@app.route('/admin/course/<cid>/exa', methods=['GET', 'POST'])
+@login_required
+def admin_course_exa(cid):
+    user = current_user
+    if user.identify != User.IDENTIFY_ADMIN:
+        abort(403)
+    course = Course.query.filter(Course.id == cid).first()
+    if course is None:
+        abort(404)
+    form = CourseExaForm()
+    if form.validate_on_submit():
+        replytext = form.replytext.data
+        location = form.location.data
+        status = form.status.data
+        course.replytext = replytext
+        course.location = location
+        course.status = status
+        course.update()
+        flash(u'S审批成功')
+    else:
+        print 'fuck!!!!!!!!'
+    return render_template('admin_course_exa.html', course=course, form=form)
+
+
 # ajax routes
 
 @app.route('/ajax/getIdentifyingcode', methods=['POST'])
