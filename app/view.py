@@ -433,7 +433,6 @@ def course_new():
 def course():
     if current_user.identify == User.IDENTIFY_MENTOR:
         abort(403)
-    # courses = Course.query.filter(Course.time_start > datetime.now()).order_by(Course.time_start).all()
     return render_template('course.html')
 
 
@@ -1042,4 +1041,26 @@ def data_xls_daily():
     if not user.canAccessData():
         abort(403)
     path = generateDailyData()
+    return send_file(path, as_attachment=True)
+
+
+@app.route('/admin/data/xls/appointment', methods=['GET'])
+@login_required
+def admin_data_xls_appointment():
+    user = current_user
+    user = User.query.filter(User.id == user.id).first()
+    if user.identify != User.IDENTIFY_ADMIN:
+        abort(403)
+    path = adminGenerateAppointmentData()
+    return send_file(path, as_attachment=True)
+
+
+@app.route('/admin/data/xls/mentor', methods=['GET'])
+@login_required
+def admin_data_xls_mentor():
+    user = current_user
+    user = User.query.filter(User.id == user.id).first()
+    if user.identify != User.IDENTIFY_ADMIN:
+        abort(403)
+    path = adminGenerateMentorData()
     return send_file(path, as_attachment=True)

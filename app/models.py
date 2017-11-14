@@ -243,6 +243,11 @@ class Course(db.Model):
     time_start = db.Column(db.DateTime)  # 课程开始时间
     time_end = db.Column(db.DateTime)  # 课程结束时间
     time_submit = db.Column(db.DateTime)
+    status = db.Column(db.Integer)
+
+    STATUS_WAITING = 0
+    STATUS_PASS = 1
+    STATUS_DENY = 2
 
     def __init__(self, name, men, capacity, description, time_start, time_end):
         self.name = name
@@ -251,6 +256,7 @@ class Course(db.Model):
         self.description = description
         self.time_start = time_start
         self.time_end = time_end
+        self.status = Course.STATUS_WAITING
         self.time_submit = datetime.now()
 
     def update(self):
@@ -426,10 +432,10 @@ class User(db.Model):
 
         text += u'<h3>可预约时间</h3>'
         if len(times) == 0:
-            text +=  u'<p>暂无限制</p>'
+            text += u'<p>暂无限制</p>'
         for time in times:
             btn = u'' if not admin else u"&nbsp;&nbsp;&nbsp;&nbsp;<a href='/admin/user/%s/avatime/%s/delete' class='btn btn-danger btn-sm'>删除</a>" % (
-            self.id, time.id)
+                self.id, time.id)
 
             text += u'<p>星期%s %s%s</p>' % (weekday_int2char[time.weekday], time.time.strftime('%H:%M'), btn)
 
@@ -439,6 +445,8 @@ class User(db.Model):
         return text
 
     def canAccessData(self):
+        if self.identify == User.IDENTIFY_ADMIN:
+            return True
         return self.id in data_access_ids
 
     def getAppointmentCount(self):
