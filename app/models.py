@@ -51,6 +51,31 @@ relation_course_student = db.Table('relation_course_student',
                                              db.ForeignKey('User.id'))
                                    )
 
+class Department(db.Model):
+    __tablename__ = 'Department'
+    id = db.Column(db.Integer,primary_key=True,autoincrement=True) # 自增主键 无意义
+    d_id = db.Column(db.String)
+    d_name = db.Column(db.String)
+
+    def __init__(self,d_id,d_name):
+        self.d_id = d_id
+        self.d_name = d_name
+
+    def update(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def getDid(self):
+        return self.d_id
+
+    def getDname(self):
+        return self.d_name
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+
 
 class Tag(db.Model):
     __tablename__ = 'Tag'
