@@ -19,7 +19,7 @@ import xlrd
 
 # Configs and View for Login
 
-lm.login_view = 'login'
+lm.login_view = 'cas.login'
 lm.login_message = u'W请先登录!'
 
 app.jinja_env.globals['getOptions_tag1'] = getOptions_tag1
