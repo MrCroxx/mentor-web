@@ -76,7 +76,8 @@
                                 <th class="col-md-1">课程地点</th>
                                 <th class="col-md-2">开始时间</th>
                                 <th class="col-md-2">结束时间</th>
-                                <th class="col-md-2">已选/容量</th>
+                                <th class="col-md-1">已选/容量</th>
+                                <th class="col-md-1">操作</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -91,6 +92,9 @@
                                     <td>{{ course.time_start }}</td>
                                     <td>{{ course.time_end }}</td>
                                     <td>{{ course.signednum }}/{{ course.capacity }}</td>
+                                    <td>
+                                        <a href="/course/{{ course.id }}/delete" class="btn btn-danger btn-sm">删除</a>
+                                    </td>
                                 </tr>
                             {% endfor %}
                             </tbody>

@@ -289,6 +289,10 @@ class Course(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
     def addStu(self, stu):
         if stu not in self.stus:
             self.stus.append(stu)

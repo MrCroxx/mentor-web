@@ -62,11 +62,13 @@
                                                class="form-control"><br/>
 
                                         <script type="text/javascript">
+                                            var date_start = new Date();
+                                            date_start.setDate(date_start.getDate() + 7);
                                             $("#time_date_string").datepicker({
                                                 autoHide: true,
                                                 format: "yyyy-mm-dd",
-                                                language: 'zh-CN',
-                                                startDate: new Date()
+                                                startDate: date_start,
+                                                language: 'zh-CN'
                                             });
                                         </script>
                                     </div>

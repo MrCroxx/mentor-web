@@ -107,6 +107,41 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel-primary">
+                                    <div class="panel-heading">
+                                        <div class="panel-title">选课学生名单</div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <table id="table_courses" class="table table-striped">
+                                                    <thead>
+                                                    <tr>
+                                                        <th class="col-md-4">学号</th>
+                                                        <th class="col-md-4">姓名</th>
+                                                        <th class="col-md-4">院系</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for user in course.stus %}
+                                                        <tr>
+                                                            <td>{{ user.id }}</td>
+                                                            <td>{{ user.name }}</td>
+                                                            <td>{{ user.getDepartmentString() }}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>

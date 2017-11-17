@@ -422,6 +422,19 @@ def course_new():
     return render_template('course_new.html', form=form)
 
 
+@app.route('/course/<cid>/delete', methods=['GET'])
+@login_required
+def course_delete(cid):
+    user = current_user
+    if user.identify != User.IDENTIFY_MENTOR:
+        abort(403)
+    course = Course.query.filter(Course.id == cid).filter(Course.men_id == user.id).first()
+    if course is None:
+        abort(404)
+    course.delete()
+    return redirect(url_for('course_men'))
+
+
 @app.route('/course', methods=['GET', 'POST'])
 @login_required
 def course():
@@ -436,7 +449,7 @@ def course():
     return render_template('course.html', form=form, courses=courses)
 
 
-@app.route('/course/men', methods=['GET','POST'])
+@app.route('/course/men', methods=['GET', 'POST'])
 @login_required
 def course_men():
     if current_user.identify != User.IDENTIFY_MENTOR:
@@ -446,6 +459,8 @@ def course_men():
     if form.validate_on_submit():
         user = User.query.filter(User.id == current_user.id).first()
         form.mine.data = True
+        form.department.data = 'ALL'
+        form.status.data = -1
         courses = QueryCourse(form, user)
     return render_template('course_men.html', form=form, courses=courses)
 
@@ -870,6 +885,7 @@ def ajax_appointment_score(aid):
             return jsonify({'status': BAD})
     else:
         return jsonify({'status': BAD})
+
 
 # Query Functions
 
