@@ -436,7 +436,7 @@ def course():
     return render_template('course.html', form=form, courses=courses)
 
 
-@app.route('/course/men', methods=['GET'])
+@app.route('/course/men', methods=['GET','POST'])
 @login_required
 def course_men():
     if current_user.identify != User.IDENTIFY_MENTOR:
