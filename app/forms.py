@@ -275,6 +275,14 @@ class MentorXLSForm(FlaskForm):
         ]
     )
 
+class MentorIMGForm(FlaskForm):
+    file = FileField(
+        'file',
+        validators=[
+            FileAllowed(img, u'暂不支持该类型文件上传'),
+            FileRequired(u'请选择文件')
+        ]
+    )
 
 class MentorTagUpdateForm(FlaskForm):
     pass

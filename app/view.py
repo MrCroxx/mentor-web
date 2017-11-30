@@ -666,6 +666,37 @@ def admin_mentor_upload_xls():
     return redirect(url_for('admin_mentor'))
 
 
+@app.route('/admin/mentor/<uid>/upload/img', methods=['POST'])
+@login_required
+def admin_mentor_upload_img(uid):
+    user = current_user
+    if user.identify != User.IDENTIFY_ADMIN:
+        abort(403)
+    u = User.query.filter(User.id == uid).first()
+    if u is None:
+        abort(404)
+    if u.identify != User.IDENTIFY_MENTOR:
+        abort(403)
+
+    form = MentorIMGForm()
+    if form.validate_on_submit():
+        file = form.file.data
+        file.filename = 'pic.jpg'
+        base_dir = app.config['BASE_DIR']
+        user_dir = os.path.join(base_dir, 'app/static/res/user')
+        user_dir = os.path.join(user_dir, u.id)
+        img_path = os.path.join(user_dir, file.filename)
+        if not os.path.exists(user_dir):
+            os.makedirs(user_dir)
+        if os.path.exists(img_path):
+            os.remove(img_path)
+        img.save(file, folder=u.id)
+        flash(u'S上传成功!若图片无变化，请清除缓存后浏览!')
+    else:
+        flash(u'D文件类型不符合或上传失败!导师图片仅支持JPG、JPEG、PNG格式图片！')
+    return redirect(url_for('admin_userinfo', uid=u.id))
+
+
 @app.route('/admin/user/<uid>')
 @login_required
 def admin_userinfo(uid):
@@ -678,7 +709,12 @@ def admin_userinfo(uid):
     tagform = MentorTagUpdateForm()
     avatimeform = AvaTimeAddForm()
     infoform = MentorInfoUpdateForm()
-    return render_template('admin_userinfo.html', user=u, tagform=tagform, avatimeform=avatimeform, infoform=infoform)
+    imgform = MentorIMGForm()
+    return render_template('admin_userinfo.html',
+                           user=u, tagform=tagform,
+                           avatimeform=avatimeform,
+                           infoform=infoform,
+                           imgform=imgform)
 
 
 @app.route('/admin/user/<uid>/tag/update', methods=['POST'])

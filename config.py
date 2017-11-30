@@ -34,6 +34,7 @@ CAS_VALIDATE_ROUTE = '/serviceValidate'
 # UPLOAD
 
 UPLOADED_XLS_DEST = 'app/static/tmp/xls'
+UPLOADED_IMG_DEST = 'app/static/res/user'
 
 # JWT
 

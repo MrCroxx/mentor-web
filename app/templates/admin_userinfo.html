@@ -27,8 +27,19 @@
                                 <div class="panel-body">
                                     <div class="row">
                                         <div class="col-md-4">
-                                            <img src="/static/res/user/{{ user.id }}/pic.jpg"
-                                                 style="width: 100%;height: auto">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <img src="/static/res/user/{{ user.id }}/pic.jpg"
+                                                         style="width: 100%;height: auto">
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <div class="btn btn-primary" data-toggle="modal"
+                                                         data-target="#upload-modal" style="width: 100%">
+                                                        <span class="glyphicon glyphicon-upload"></span> 上传/修改导师照片
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                         </div>
                                         <div class="col-md-8">
                                             <h3>
@@ -330,6 +341,61 @@
         </div><!-- /.modal -->
     </div>
 
+    <div class="modal fade" id="upload-modal" tabindex="-1" role="dialog"
+         aria-labelledby="upload-modal-label"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="upload-modal-label">
+                        上传/修改导师照片
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="/admin/mentor/{{ user.id }}/upload/img" enctype="multipart/form-data">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                {{ imgform.hidden_tag() }}
+                                <div class="row">
+                                    <div class="center-block" style="width: 300px">
+                                        <div class="form-group form-inline">
+                                            <input id="file" name='file' type="file" style="display:none">
+                                            <div class="input-append">
+                                                <input id="choosefile" class="form-control" type="text">
+                                                <a class="btn btn-primary" onclick="$('#file').click();">选择文件</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <script type="text/javascript">
+                                    $('#file').change(function () {
+                                        $('#choosefile').val($(this).val());
+                                    });
+                                </script>
+                            </div>
+                        </div>
+                        <div class="row">
+
+                            <div class="col-md-12">
+
+                                <button type="submit" class="btn btn-primary pull-right">
+                                    确定
+                                </button>
+                                <button class="btn btn-default pull-right" data-dismiss="modal">
+                                    取消
+                                </button>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
 
 
 
