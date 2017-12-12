@@ -64,7 +64,7 @@ def mentor_xls_import(path):
         description = ""
         if row[5] != "":
             description += "<h3>" + u"学术兼职" + "</h3>"
-            description += "<p>" + str(row[5]) + "</p>"
+            description += "<p>" + row[5].encode('utf-8') + "</p>"
         if row[6] != "":
             description += "<h3>" + u"教育背景" + "</h3>"
             description += "<p>" + str(row[6]) + "</p>"
