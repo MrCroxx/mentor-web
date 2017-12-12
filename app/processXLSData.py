@@ -55,7 +55,7 @@ def mentor_xls_import(path):
     for i in range(1, sheet.nrows):
         row = sheet.row_values(i)
         for i in range(len(row)):
-            row[i] = str(row[i]).encode('utf-8')
+            row[i] = row[i].encode('utf-8')
         id = str(row[0])
         department = str(row[2])
         name = str(row[1])
