@@ -56,10 +56,10 @@ def mentor_xls_import(path):
         row = sheet.row_values(i)
         id = str(row[0])
         department = str(row[2])
-        name = row[1]
-        title = row[3]
-        if row[4] != "":
-            title += ',' + row[4]
+        name = str(row[1])
+        title = str(row[3])
+        if str(row[4]) != "":
+            title += ',' + str(row[4])
 
         description = ""
         if row[5] != "":
