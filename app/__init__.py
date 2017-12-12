@@ -8,6 +8,9 @@ from flask_cas import CAS
 import cx_Oracle
 import os
 from app.secret import *
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
 os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
 
