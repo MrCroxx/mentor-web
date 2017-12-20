@@ -15,7 +15,7 @@ def mentor_xls_validate(path):
         department_id = str(row[2])
         if department_id not in department_id2name:
             flag = False
-            err += u'表1第%s行部门代码不存在!\n' % i + 1
+            err += u'表1第%s行部门代码不存在!\n' % (i + 1,)
     sheet = data.sheets()[1]
     for i in range(1, sheet.nrows):
         row = sheet.row_values(i)
@@ -23,18 +23,18 @@ def mentor_xls_validate(path):
         m = re.search(ur'\d+', t)
         if m is None:
             flag = False
-            err += u'表2第%s行星期格式不正确!\n' % i + 1
+            err += u'表2第%s行星期格式不正确!\n' % (i + 1,)
         else:
             m = m.group()
             m = int(m)
             if not (m >= 1 and m <= 7):
                 flag = False
-                err += u'表2第%s行星期不正确!\n' % i + 1
+                err += u'表2第%s行星期不正确!\n' % (i + 1,)
         t = str(row[2])
         m = re.search(ur'\d+:\d+', t)
         if m is None:
             flag = False
-            err += u'表2第%s行时间格式不正确!\n' % i + 1
+            err += u'表2第%s行时间格式不正确!\n' % (i + 1,)
     sheet = data.sheets()[2]
     for i in range(1, sheet.nrows):
         row = sheet.row_values(i)
@@ -42,7 +42,7 @@ def mentor_xls_validate(path):
         tag = Tag.query.filter(Tag.tag2id == tag2).first()
         if tag is None:
             flag = False
-            err += u'表3第%s行细分标签不存在，请先添加标签!\n' % i + 1
+            err += u'表3第%s行细分标签不存在，请先添加标签!\n' % (i + 1,)
     return flag, err
 
 
