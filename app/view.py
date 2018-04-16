@@ -475,6 +475,9 @@ def course_sign(cid):
     course = Course.query.filter(Course.id == cid).first()
     if course is None:
         abort(404)
+    if datetime.now() > course.time_start:
+        flash(u'D课程已经开始,无法选课!')
+        return redirect(url_for('course'))
     if course.full():
         flash(u'D课程已满!')
         return redirect(url_for('course'))
@@ -981,10 +984,12 @@ def QueryCourse(form, user):
             courses = courses.filter(Course.time_start >= datetime_query_min).filter(
                 Course.time_start <= datetime_query_max)
 
+    courses = courses.filter(Course.time_start>datetime.now())
+
     if department != 'ALL':
         courses = courses.join(User.courses_men).filter(User.department == department)
 
-    courses = courses.order_by(Course.time_start).all()
+    courses = courses.order_by(desc(Course.time_start)).all()
     if user.identify == User.IDENTIFY_STUDENT:
         courses_dict = [course.toDict(user) for course in courses]
     else:
